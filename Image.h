@@ -44,9 +44,14 @@ typedef union Color
 			color.blu += (char)colorVector.z;
 		return color;
 	}
+	Color operator*(float c)
+	{
+
+		return Color{ (unsigned char)(red * c),(unsigned char)(grn * c),(unsigned char)(blu * c) };
+	}
 	ostream& operator<<(ostream& os)
 	{
-		return os << "red: " << red << " green: " << grn<< " blue: " << blu << endl;
+		return os << "red: " << red << " green: " << grn << " blue: " << blu << endl;
 
 	}
     unsigned char channel[3];

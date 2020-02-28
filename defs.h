@@ -38,11 +38,11 @@ typedef struct Vector3f
         this->z = v2.z;
         return *this;
     }
-    float dotProduct(const Vector3f v1)
+    float dotProduct(const Vector3f v1) const
     {
         return x*v1.x+y*v1.y+z*v1.z;
     }
-     float length()
+     float length() const
     {
         return sqrt(x*x+y*y+z*z);
     }

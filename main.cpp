@@ -7,8 +7,9 @@ Scene *pScene; // definition of the global scene variable (declared in defs.h)
 int main(int argc, char *argv[])
 {
 	
+
 	/* Do your stuff here */
-	const char *xmlPath = "hw1/cornellbox.xml";
+	const char *xmlPath = "hw2/cornellbox_recursive.xml" ;
     cout<< xmlPath<<endl;
 	clock_t tStart = clock();
 	for (int i = 0; i < 1; i++) 

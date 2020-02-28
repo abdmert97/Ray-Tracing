@@ -3,8 +3,9 @@
 
 void Reflection::getReflection(int depth, ReturnVal& closestObjectReturnVal, Material material, Color& color, Vector3f cameraVectorNormalized)
 {
-	if (material.mirrorRef.length() > 0.0)
+	if (material.materialType != Default)
 	{
+		
 		Vector3f reflectionDirection = (cameraVectorNormalized * -1 + closestObjectReturnVal.hitNormal * (closestObjectReturnVal.hitNormal.dotProduct(cameraVectorNormalized)) * 2).normalizeVector();
 		Ray* reflectionRay = new Ray(closestObjectReturnVal.intersectionPoint + reflectionDirection * shadowRayEps, reflectionDirection);
 

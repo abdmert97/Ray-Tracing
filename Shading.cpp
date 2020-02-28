@@ -1,6 +1,6 @@
 #include "Shading.h"
 #include "Light.h"
-
+int shadowcount = 0;
 
 Color Shading::shading(int depth, Shape*& shape, ReturnVal& closestObjectReturnVal, Ray& ray)
 {
@@ -10,7 +10,7 @@ Color Shading::shading(int depth, Shape*& shape, ReturnVal& closestObjectReturnV
 		Color color = { 0,0,0 };
 		return color;
 	}
-
+	shadowcount++;
 	Material material = *materials[shape->matIndex - 1];
 	Color color = ambientLightList[shape->matIndex - 1];
 	PointLight* light;
@@ -34,8 +34,12 @@ Color Shading::shading(int depth, Shape*& shape, ReturnVal& closestObjectReturnV
 	}
 
 	// Reflection
-	
-	reflection->getReflection(depth, closestObjectReturnVal, material, color, cameraVectorNormalized);
+	if (material.materialType == Default)
+		return color;
+	if (material.materialType == Mirror)
+		reflection->getReflection(depth, closestObjectReturnVal, material, color, cameraVectorNormalized);
+	else
+		refraction->refraction(depth, ray, closestObjectReturnVal, material, color,cameraVectorNormalized);
 	return color;
 }
 bool Shading::isShadow(Vector3f& lightPosition, Vector3f& intersectionPoint)const

@@ -7,21 +7,8 @@
 #include "Image.h"
 #include <thread> 
 using namespace tinyxml2;
+extern  int shadowcount;
 
-void Scene::setScene()
-{
-	lightCount = lights.size();
-	objectCount = objects.size();
-	ambientLightList = new Color[materials.size()];
-	for (int i = 0; i < materials.size(); i++)
-	{
-		Material mat = *materials[i];
-		ambientLightList[i].red = (unsigned char)(mat.ambientRef.x * ambientLight.x);
-		ambientLightList[i].grn = (unsigned char)(mat.ambientRef.y *ambientLight.y);
-		ambientLightList[i].blu = (unsigned char)(mat.ambientRef.z * ambientLight.z);
-	}
-	cameraCount = cameras.size();
-}
 
 void Scene::threading(Camera* camera, Image* image)
 {
@@ -35,21 +22,21 @@ void Scene::threading(Camera* camera, Image* image)
 	std::thread td7(&Scene::renderImagePart, this, 7, camera, image);
 		
 	td0.join();
-	cout << "part1 rendered" << endl;
+	//cout << "part1 rendered" << endl;
 	td1.join();
-	cout << "part2 rendered" << endl;
+	//cout << "part2 rendered" << endl;
 	td2.join();
-	cout << "part3 rendered" << endl;
+	//cout << "part3 rendered" << endl;
 	td3.join();
-	cout << "part4 rendered" << endl;
+	//cout << "part4 rendered" << endl;
 	td4.join();
-	cout << "part5 rendered" << endl;
+	//cout << "part5 rendered" << endl;
 	td5.join();
-	cout << "part6 rendered" << endl;
+	//cout << "part6 rendered" << endl;
 	td6.join();
-	cout << "part7 rendered" << endl;
+	//cout << "part7 rendered" << endl;
 	td7.join();
-	cout << "part8 rendered" << endl;
+	//cout << "part8 rendered" << endl;
 }
 
 /*
@@ -63,13 +50,51 @@ void Scene::renderScene(void)
 		Camera* camera = cameras[i];
 		ImagePlane imagePlane = camera->imgPlane;
 		Image* image = new Image(imagePlane.nx, imagePlane.ny);
-
+	
 		threading(camera, image);
-		
+		//renderImage(camera, image);
 		image->saveImage(cameras[i]->imageName);
 	}
-}
 
+}
+void Scene::renderImage(Camera* camera, Image* image)
+{
+	ImagePlane imagePlane = camera->imgPlane;
+	ReturnVal returnValue;
+	Shape* shape;
+	Color color = { 0,0,0 };
+	int maxWidth = (imagePlane.nx);
+	for (int w = 0; w < maxWidth; w++)
+	{
+
+		for (int h = 0; h < imagePlane.ny; h++)
+		{
+
+			Ray ray = camera->getPrimaryRay(w, h);
+
+			// Selecting Closest object to the camera
+			ReturnVal closestObjectReturnVal = rayIntersection->closestObject(ray);
+			if (closestObjectReturnVal.objectID == -1) // ray hits nothing
+			{
+				// Set background Color 
+				Color color2 = { (unsigned char)backgroundColor.r,(unsigned char)backgroundColor.g,(unsigned char)backgroundColor.b };
+				image->setPixelValue(w, h, color2);
+			}
+			else // if ray hits an object
+			{
+				color = { 0,0,0 };
+				// start Shading a object
+
+				shape = objects[closestObjectReturnVal.objectID];
+				Color color2 = shading->shading(maxRecursionDepth, shape, closestObjectReturnVal, ray);
+
+				//  cout<<(int)color.red<< " "<<(int)color.grn<< " "<<(int)color.blu<< " "<<endl;
+				image->setPixelValue(w, h, color2);
+			}
+
+		}
+	}
+}
 void Scene::renderImagePart(int part, Camera* camera, Image* image)
 {
 
@@ -179,6 +204,7 @@ void Scene::readXML(const char* xmlPath)
 		ImagePlane imgPlane;
 
 		eResult = pCamera->QueryIntAttribute("id", &id);
+		const char* type = pCamera->Attribute("type");
 		camElement = pCamera->FirstChildElement("Position");
 		str = camElement->GetText();
 		sscanf(str, "%f %f %f", &pos.x, &pos.y, &pos.z);
@@ -214,8 +240,17 @@ void Scene::readXML(const char* xmlPath)
 		materials.push_back(new Material());
 
 		int curr = materials.size() - 1;
-
+	
 		eResult = pMaterial->QueryIntAttribute("id", &materials[curr]->id);
+		const char* type = pMaterial->Attribute("type");
+		if (type == nullptr)
+			materials[curr]->materialType = Default;
+		else if(type[0] == 'm')
+			materials[curr]->materialType = Mirror;
+		else if (type[0] == 'c')
+			materials[curr]->materialType = Conductor;
+		else if (type[0] == 'd')
+			materials[curr]->materialType = Dialectic;
 		materialElement = pMaterial->FirstChildElement("AmbientReflectance");
 		str = materialElement->GetText();
 		sscanf(str, "%f %f %f", &materials[curr]->ambientRef.r, &materials[curr]->ambientRef.g, &materials[curr]->ambientRef.b);
@@ -237,10 +272,33 @@ void Scene::readXML(const char* xmlPath)
 			materials[curr]->mirrorRef.g = 0.0;
 			materials[curr]->mirrorRef.b = 0.0;
 		}
+
+		materialElement = pMaterial->FirstChildElement("AbsorptionCoefficient");
+		if (materialElement != nullptr)
+		{
+			str = materialElement->GetText();
+			sscanf(str, "%f %f %f", &materials[curr]->absorptionCoefficient.r, &materials[curr]->absorptionCoefficient.g, &materials[curr]->absorptionCoefficient.b);
+		}
+		else
+		{
+			materials[curr]->absorptionCoefficient.r = 0.0;
+			materials[curr]->absorptionCoefficient.g = 0.0;
+			materials[curr]->absorptionCoefficient.b = 0.0;
+		}
+		
 		materialElement = pMaterial->FirstChildElement("PhongExponent");
 		if (materialElement != nullptr)
 			materialElement->QueryIntText(&materials[curr]->phongExp);
 
+		materialElement = pMaterial->FirstChildElement("RefractionIndex");
+		if (materialElement != nullptr)
+			materialElement->QueryFloatText(&materials[curr]->refractionIndex);
+
+		materialElement = pMaterial->FirstChildElement("AbsorptionIndex");
+		if (materialElement != nullptr)
+			materialElement->QueryFloatText(&materials[curr]->absorptionIndex);
+
+		
 		pMaterial = pMaterial->NextSiblingElement("Material");
 	}
 
@@ -398,12 +456,31 @@ Scene::Scene(const char* xmlPath)
 	readXML(xmlPath);
 	initObjects();
 }
-
+void Scene::setScene()
+{
+	lightCount = lights.size();
+	objectCount = objects.size();
+	ambientLightList = new Color[materials.size()];
+	for (int i = 0; i < materials.size(); i++)
+	{
+		Material mat = *materials[i];
+		ambientLightList[i].red = (unsigned char)(mat.ambientRef.x * ambientLight.x);
+		ambientLightList[i].grn = (unsigned char)(mat.ambientRef.y * ambientLight.y);
+		ambientLightList[i].blu = (unsigned char)(mat.ambientRef.z * ambientLight.z);
+	}
+	cameraCount = cameras.size();
+}
 void Scene::initObjects()
 {
 	setScene();
 	rayIntersection = new RayIntersection(objects, objectCount);
-	reflection = new Reflection(rayIntersection,shading,shadowRayEps,objects,backgroundColor);
-	shading = new Shading(reflection,shadowRayEps,materials,ambientLightList,lightCount,objectCount,lights,objects);
+	reflection = new Reflection(shadowRayEps,objects,backgroundColor);
+	shading = new Shading(shadowRayEps,materials,ambientLightList,lightCount,objectCount,lights,objects);
+	shading->reflection = reflection;
+	reflection->shading = shading;
+	reflection->rayIntersection = rayIntersection;
+	refraction = new Refraction(reflection, shading, objects, rayIntersection);
+	shading->refraction = refraction;
+
 }
 

@@ -13,16 +13,18 @@ class Shading;
 class RayIntersection;
 class Reflection
 {
-	RayIntersection* rayIntersection;
-	Shading* shading;
+	
 	float shadowRayEps;
 	vector<Shape*> objects;
-	Vector3f backgroundColor;
+	
 public:
-	Reflection(RayIntersection* const ray_ýntersection, Shading* const shading, const float shadow_ray_eps,
+	Vector3f backgroundColor;
+	Shading* shading;
+	RayIntersection* rayIntersection;
+
+	Reflection( const float shadow_ray_eps,
 		const vector<Shape*>& objects, const Vector3f& background_color)
-		: rayIntersection(ray_ýntersection),
-		  shading(shading),
+		:
 		  shadowRayEps(shadow_ray_eps),
 		  objects(objects),
 		  backgroundColor(background_color)

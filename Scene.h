@@ -17,6 +17,7 @@
 class Shading;
 class RayIntersection;
 class Reflection;
+class Refraction;
 // Forward declarations to avoid cyclic references
 class Camera;
 class PointLight;
@@ -44,19 +45,22 @@ public:
 	Shading* shading;
 	RayIntersection* rayIntersection;
 	Reflection* reflection;
+	Refraction* refraction;
 	void initObjects();
 	Scene(const char *xmlPath);		// Constructor. Parses XML file and initializes vectors above. Implemented for you.
 
 	void setScene();
 	void threading(Camera* camera, Image* image);
+	
 	void renderScene(void);			// Method to render scene, an image is created for each camera in the scene. You will implement this.
+	void renderImage(int part, Camera* camera, Image* image);
 	void convertPPMToPNG(string ppmFileName, int osType);
 	void readXML(const char* xmlPath);
 
 
 private:
 	void renderImagePart(int part, Camera* camera, Image* image);
-
+	void renderImage(Camera* camera, Image* image);
 	
 
 	
