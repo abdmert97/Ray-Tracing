@@ -4,20 +4,28 @@
 #include <vector>
 #include "Ray.h"
 #include "defs.h"
-
+#include "BoundingBox.h"
 using namespace std;
-
+enum ShapeType
+{
+	TriangleShape,
+	SphereType,
+	MeshType
+	
+};
+class BoundingBox;
 // Base class for any shape object
 class Shape
 {
 public:
 	int id;	        // Id of the shape
 	int matIndex;	// Material index of the shape
-
+	ShapeType shapeType;
+	BoundingBox* bounds;
 	virtual ReturnVal intersect(const Ray & ray) const = 0; // Pure virtual method for intersection test. You must implement this for sphere, triangle, and mesh.
-
+	virtual BoundingBox* getBounds();
     Shape(void);
-    Shape(int id, int matIndex); // Constructor
+    Shape(int id, int matIndex, ShapeType type); // Constructor
 
 private:
 
@@ -28,9 +36,9 @@ class Sphere: public Shape
 {
 public:
 	Sphere(void);	// Constructor
-	Sphere(int id, int matIndex, int cIndex, float R, vector<Vector3f> *vertices);	// Constructor
+	Sphere(int id, int matIndex, int cIndex, float R, vector<Vector3f> *vertices,ShapeType type);	// Constructor
 	ReturnVal intersect(const Ray & ray) const;	// Will take a ray and return a structure related to the intersection information. You will implement this.
-
+	BoundingBox* getBounds();
 private:
 	Vector3f center;
 	float radius;
@@ -42,9 +50,9 @@ class Triangle: public Shape
 {
 public:
 	Triangle(void);	// Constructor
-	Triangle(int id, int matIndex, int p1Index, int p2Index, int p3Index, vector<Vector3f> *vertices);	// Constructor
+	Triangle(int id, int matIndex, int p1Index, int p2Index, int p3Index, vector<Vector3f> *vertices, ShapeType type);	// Constructor
 	ReturnVal intersect(const Ray & ray) const; // Will take a ray and return a structure related to the intersection information. You will implement this.
-
+	BoundingBox* getBounds();
 private:
     Vector3f point1;
     Vector3f point2;
@@ -56,9 +64,9 @@ class Mesh: public Shape
 {
 public:
 	Mesh(void);	// Constructor
-	Mesh(int id, int matIndex, const vector<Triangle>& faces, vector<int> *pIndices, vector<Vector3f> *vertices);	// Constructor
+	Mesh(int id, int matIndex, const vector<Triangle>& faces, vector<int> *pIndices, vector<Vector3f> *vertices, ShapeType type);	// Constructor
 	ReturnVal intersect(const Ray & ray) const; // Will take a ray and return a structure related to the intersection information. You will implement this.
-
+	BoundingBox* getBounds();
 private:
 	 const vector<Triangle> faces;
 

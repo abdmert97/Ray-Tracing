@@ -39,7 +39,7 @@ Color Shading::shading(int depth, Shape*& shape, ReturnVal& closestObjectReturnV
 	if (material.materialType == Mirror)
 		reflection->getReflection(depth, closestObjectReturnVal, material, color, cameraVectorNormalized);
 	else
-		refraction->refraction(depth, ray, closestObjectReturnVal, material, color,cameraVectorNormalized);
+		refraction->refraction(depth, ray, closestObjectReturnVal, material, color,ray.direction);
 	return color;
 }
 bool Shading::isShadow(Vector3f& lightPosition, Vector3f& intersectionPoint)const

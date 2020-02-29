@@ -14,6 +14,7 @@
 #include "Shading.h"
 #include "RayIntersection.h"
 #include "Reflection.h"
+#include "BoundingVolume.h"
 class Shading;
 class RayIntersection;
 class Reflection;
@@ -23,7 +24,7 @@ class Camera;
 class PointLight;
 class Material;
 class Shape;
-
+class BoundingVolume;
 using namespace std;
 
 // Class to hold everything related to a scene.
@@ -46,6 +47,7 @@ public:
 	RayIntersection* rayIntersection;
 	Reflection* reflection;
 	Refraction* refraction;
+	BoundingVolume* boundingVolume;
 	void initObjects();
 	Scene(const char *xmlPath);		// Constructor. Parses XML file and initializes vectors above. Implemented for you.
 

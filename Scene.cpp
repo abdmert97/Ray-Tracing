@@ -348,7 +348,7 @@ void Scene::readXML(const char* xmlPath)
 		objElement = pObject->FirstChildElement("Radius");
 		eResult = objElement->QueryFloatText(&R);
 
-		objects.push_back(new Sphere(id, matIndex, cIndex, R, &vertices));
+		objects.push_back(new Sphere(id, matIndex, cIndex, R, &vertices,SphereType));
 
 		pObject = pObject->NextSiblingElement("Sphere");
 	}
@@ -370,7 +370,7 @@ void Scene::readXML(const char* xmlPath)
 		str = objElement->GetText();
 		sscanf(str, "%d %d %d", &p1Index, &p2Index, &p3Index);
 
-		objects.push_back(new Triangle(id, matIndex, p1Index, p2Index, p3Index, &vertices));
+		objects.push_back(new Triangle(id, matIndex, p1Index, p2Index, p3Index, &vertices,TriangleShape));
 
 		pObject = pObject->NextSiblingElement("Triangle");
 	}
@@ -412,13 +412,13 @@ void Scene::readXML(const char* xmlPath)
 				while (str[cursor] == ' ' || str[cursor] == '\t' || str[cursor] == '\n')
 					cursor++;
 			}
-			faces.push_back(*(new Triangle(-1, matIndex, p1Index, p2Index, p3Index, &vertices)));
+			faces.push_back(*(new Triangle(-1, matIndex, p1Index, p2Index, p3Index, &vertices,TriangleShape)));
 			meshIndices->push_back(p1Index);
 			meshIndices->push_back(p2Index);
 			meshIndices->push_back(p3Index);
 		}
 
-		objects.push_back(new Mesh(id, matIndex, faces, meshIndices, &vertices));
+		objects.push_back(new Mesh(id, matIndex, faces, meshIndices, &vertices,MeshType));
 
 		pObject = pObject->NextSiblingElement("Mesh");
 	}
@@ -481,6 +481,9 @@ void Scene::initObjects()
 	reflection->rayIntersection = rayIntersection;
 	refraction = new Refraction(reflection, shading, objects, rayIntersection);
 	shading->refraction = refraction;
-
+	
+	boundingVolume = new BoundingVolume(objects);
+	
+	rayIntersection->boundingVolume = boundingVolume;
 }
 

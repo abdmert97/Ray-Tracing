@@ -2,21 +2,28 @@
 #include "Scene.h"
 #include <cstdio>
 #include <cmath>
+
+BoundingBox* Shape::getBounds()
+{
+	return new BoundingBox;
+}
+
 Shape::Shape(void)
 {
 }
 
-Shape::Shape(int id, int matIndex)
-    : id(id), matIndex(matIndex)
+Shape::Shape(int id, int matIndex, ShapeType type)
+    : id(id), matIndex(matIndex) ,shapeType(type)
 {
+	bounds = nullptr;
 }
 
 Sphere::Sphere(void)
 {}
 
 /* Constructor for sphere. You will implement this. */
-Sphere::Sphere(int id, int matIndex, int cIndex, float R, vector<Vector3f> *pVertices)
-    : Shape(id, matIndex)
+Sphere::Sphere(int id, int matIndex, int cIndex, float R, vector<Vector3f> *pVertices, ShapeType type)
+    : Shape(id, matIndex,type)
 {
 this->radius = R;
 this->center = (*pVertices)[cIndex-1];
@@ -57,12 +64,48 @@ ReturnVal Sphere::intersect(const Ray & ray) const
     return returnValue;
 }
 
+BoundingBox* Sphere::getBounds()
+{
+	if(bounds == nullptr)
+	{
+		bounds = new BoundingBox();
+		Vector3f radiusVec = { radius,radius,radius };
+		bounds->min = center - radiusVec;
+		bounds->max = center + radiusVec;
+	}
+	return bounds;
+}
+BoundingBox* Triangle::getBounds()
+{
+	if (bounds == nullptr)
+	{
+		bounds = new BoundingBox();
+		bounds->min = BoundingBox::getMin(point1, BoundingBox::getMin(point2, point3));
+		bounds->max = BoundingBox::getMax(point1, BoundingBox::getMax(point2, point3));
+	}
+	return bounds;
+}
+BoundingBox* Mesh::getBounds()
+{
+	if (bounds == nullptr)
+	{
+		bounds = new BoundingBox();
+		for (Triangle triangle : faces)
+		{
+			BoundingBox* triangleBounds = triangle.getBounds();
+			bounds->min = BoundingBox::getMin(bounds->min, triangleBounds->min);
+			bounds->max = BoundingBox::getMax(bounds->max, triangleBounds->max);
+		}
+	}
+	return bounds;
+}
+
 Triangle::Triangle(void)
 {}
 
 /* Constructor for triangle. You will implement this. */
-Triangle::Triangle(int id, int matIndex, int p1Index, int p2Index, int p3Index, vector<Vector3f> *pVertices)
-    : Shape(id, matIndex)
+Triangle::Triangle(int id, int matIndex, int p1Index, int p2Index, int p3Index, vector<Vector3f> *pVertices, ShapeType type)
+    : Shape(id, matIndex,type)
 {
     point1 = pVertices[0][p1Index-1];
     point2 = pVertices[0][p2Index-1];
@@ -131,8 +174,8 @@ Mesh::Mesh()
 {}
 
 /* Constructor for mesh. You will implement this. */
-Mesh::Mesh(int id, int matIndex, const vector<Triangle>& faces, vector<int> *pIndices, vector<Vector3f> *pVertices)
-    : Shape(id, matIndex),faces(faces)
+Mesh::Mesh(int id, int matIndex, const vector<Triangle>& faces, vector<int> *pIndices, vector<Vector3f> *pVertices, ShapeType type)
+    : Shape(id, matIndex,type),faces(faces)
 {
 
 }
