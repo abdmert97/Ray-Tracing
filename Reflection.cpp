@@ -22,7 +22,7 @@ void Reflection::getReflection(int depth, ReturnVal& closestObjectReturnVal, Mat
 			reflectance = { reflectanceColor.red * reflectance.x,
 				reflectanceColor.grn * reflectance.y,
 				reflectanceColor.blu * reflectance.z };
-
+		
 			color = color + reflectance;
 		}
 		else

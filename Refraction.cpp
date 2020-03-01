@@ -48,7 +48,7 @@ float Refraction::fresnel(const Vector3f& incoming, const Vector3f& normal, cons
 		if (material.materialType == Dialectic)
 		{
 			kr = (Rs * Rs + Rp * Rp) / 2;
-		
+			
 		}
 		else
 			kr = (Rs + Rp) / 2;
@@ -77,22 +77,24 @@ void Refraction::refraction(int depth, Ray ray,ReturnVal intersection,Material m
 	Vector3f hitPoint = ray.getPoint(intersection.t);
 	if (kr < 1) {
 
-	
 		Vector3f refractionDirection = refract(incoming, intersection.hitNormal, material.refractionIndex).normalizeVector();
 		Vector3f refractionRayOrig = outside ? hitPoint - bias : hitPoint + bias;
-		
-		
+
+	
+		Shape* intersectShape = objects[intersection.objectID];
 		Ray* reflectionRay = new Ray(refractionRayOrig, refractionDirection);
-		ReturnVal refractionIntersect = rayIntersection->closestObject(*reflectionRay);
+		ReturnVal refractionIntersect = rayIntersection->closestObjectRefraction(*reflectionRay,intersectShape);
 		if(refractionIntersect.isIntersect)
 		{
 			Shape* reflectionShape = objects[refractionIntersect.objectID];
-		
+			
 			refractionColor = shading->shading(depth - 1, reflectionShape, refractionIntersect, *reflectionRay);
+			
+			
 		}
 		else
 		{
-		
+			
 			refractionColor = { (unsigned char)(reflection->backgroundColor.r * material.mirrorRef.x),
 				(unsigned char)(reflection->backgroundColor.g * material.mirrorRef.y),
 				(unsigned char)(reflection->backgroundColor.b * material.mirrorRef.z) };

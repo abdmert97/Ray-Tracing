@@ -26,6 +26,7 @@ public:
 	void updateRetVal(ReturnVal& retVal,const ReturnVal& newVal);
 	ReturnVal BoundingBoxIntersection(Ray ray, Node* node, float *t_min, ReturnVal* retVal);
 	ReturnVal closestObject(Ray ray);
+	ReturnVal closestObjectRefraction(Ray ray, Shape* shape);
 };
 
 #endif
