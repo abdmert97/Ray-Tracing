@@ -47,7 +47,7 @@ private:
 	Vector3f& lightIntensity, Vector3f& normal) const;
 	Vector3f diffuseShading(Vector3f lightRayVector, Material& material, Vector3f& lightIntensity, Vector3f& normal)const;
 public:
-	Color shading(int depth, Shape*& shape, ReturnVal& closestObjectReturnVal, Ray& ray);
+	Color shading(int depth, Shape*& shape, ReturnVal& closestObjectReturnVal, Ray& ray, float n_t =1);
 	
 };
 

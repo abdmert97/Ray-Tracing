@@ -31,10 +31,10 @@ public:
 	RayIntersection *rayIntersection;
 	
 	Color dialecticRefraction(Ray ray,Material material);
-	float fresnel(const Vector3f& incoming, const Vector3f& normal, const float& refractionIndex, Material material);
+	float fresnel(const Vector3f& incoming, const Vector3f& normal, const float& refractionIndex, Material material, float n_i);
 	void printColor(const Color& color);
-	void refraction(int depth, Ray ray, ReturnVal intersection,Material material, Color& color, Vector3f incoming);
-	Vector3f refract(const Vector3f& incoming, const Vector3f& normal, const float& refractionIndex);
+	void refraction(int depth, Ray ray, ReturnVal intersection, Material material, Color& color, Vector3f rayDirection, float n_i);
+	Vector3f refract(const Vector3f& incoming, const Vector3f& normal, const float& refractionIndex, float n_i);
 	
 	Vector3f reflect(const Vector3f& incoming, const Vector3f& normal);
 	

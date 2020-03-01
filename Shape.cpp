@@ -12,8 +12,8 @@ Shape::Shape(void)
 {
 }
 
-Shape::Shape(int id, int matIndex, ShapeType type)
-    : id(id), matIndex(matIndex) ,shapeType(type)
+Shape::Shape(int id, int matIndex,Material * material, ShapeType type)
+    : id(id), matIndex(matIndex) ,shapeType(type),material(material)
 {
 	bounds = nullptr;
 }
@@ -22,8 +22,8 @@ Sphere::Sphere(void)
 {}
 
 /* Constructor for sphere. You will implement this. */
-Sphere::Sphere(int id, int matIndex, int cIndex, float R, vector<Vector3f> *pVertices, ShapeType type)
-    : Shape(id, matIndex,type)
+Sphere::Sphere(int id, int matIndex, Material* material, int cIndex, float R, vector<Vector3f> *pVertices, ShapeType type)
+    : Shape(id, matIndex,material,type)
 {
 this->radius = R;
 this->center = (*pVertices)[cIndex-1];
@@ -104,8 +104,8 @@ Triangle::Triangle(void)
 {}
 
 /* Constructor for triangle. You will implement this. */
-Triangle::Triangle(int id, int matIndex, int p1Index, int p2Index, int p3Index, vector<Vector3f> *pVertices, ShapeType type)
-    : Shape(id, matIndex,type)
+Triangle::Triangle(int id, int matIndex, Material* material, int p1Index, int p2Index, int p3Index, vector<Vector3f> *pVertices, ShapeType type)
+    : Shape(id, matIndex,material,type)
 {
     point1 = pVertices[0][p1Index-1];
     point2 = pVertices[0][p2Index-1];
@@ -174,8 +174,8 @@ Mesh::Mesh()
 {}
 
 /* Constructor for mesh. You will implement this. */
-Mesh::Mesh(int id, int matIndex, const vector<Triangle>& faces, vector<int> *pIndices, vector<Vector3f> *pVertices, ShapeType type)
-    : Shape(id, matIndex,type),faces(faces)
+Mesh::Mesh(int id, int matIndex, Material* material, const vector<Triangle>& faces, vector<int> *pIndices, vector<Vector3f> *pVertices, ShapeType type)
+    : Shape(id, matIndex,material,type),faces(faces)
 {
 
 }

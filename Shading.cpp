@@ -1,10 +1,10 @@
 #include "Shading.h"
 #include "Light.h"
+#include "Scene.h"
 int shadowcount = 0;
 
-Color Shading::shading(int depth, Shape*& shape, ReturnVal& closestObjectReturnVal, Ray& ray)
+Color Shading::shading(int depth, Shape*& shape, ReturnVal& closestObjectReturnVal, Ray& ray,float n_t)
 {
-	// If recursion depth is reached
 	if (depth < 0)
 	{
 		Color color = { 0,0,0 };
@@ -39,7 +39,7 @@ Color Shading::shading(int depth, Shape*& shape, ReturnVal& closestObjectReturnV
 	if (material.materialType == Mirror)
 		reflection->getReflection(depth, closestObjectReturnVal, material, color, cameraVectorNormalized);
 	else
-		refraction->refraction(depth, ray, closestObjectReturnVal, material, color,ray.direction);
+		refraction->refraction(depth, ray, closestObjectReturnVal, material, color,ray.direction,n_t);
 	return color;
 }
 bool Shading::isShadow(Vector3f& lightPosition, Vector3f& intersectionPoint)const

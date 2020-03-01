@@ -31,7 +31,7 @@ using namespace std;
 class Scene
 {
 public:
-	int maxRecursionDepth;			// Maximum recursion depth
+	static int maxRecursionDepth;			// Maximum recursion depth
 	float intTestEps;				// IntersectionTestEpsilon. You will need this one while implementing intersect routines in Shape class
 	float shadowRayEps;				// ShadowRayEpsilon. You will need this one while generating shadow rays.
 	Vector3f backgroundColor;		// Background color

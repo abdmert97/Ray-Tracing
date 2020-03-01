@@ -82,7 +82,8 @@ ReturnVal RayIntersection::closestObject(Ray ray)
 				closestObjectReturnVal.intersectionPoint = returnValue->intersectionPoint;
 				closestObjectReturnVal.objectID = o;
 				closestObjectReturnVal.isIntersect = true;
-				closestObjectReturnVal.t = tValue;
+				closestObjectReturnVal.t = closestObjectDistance;
+			
 			}
 		}
 	}

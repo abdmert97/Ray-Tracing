@@ -8,7 +8,7 @@
 #include <thread> 
 using namespace tinyxml2;
 extern  int shadowcount;
-
+int Scene::maxRecursionDepth = 0;
 
 void Scene::threading(Camera* camera, Image* image)
 {
@@ -347,8 +347,8 @@ void Scene::readXML(const char* xmlPath)
 		eResult = objElement->QueryIntText(&cIndex);
 		objElement = pObject->FirstChildElement("Radius");
 		eResult = objElement->QueryFloatText(&R);
-
-		objects.push_back(new Sphere(id, matIndex, cIndex, R, &vertices,SphereType));
+		Material* material = materials[matIndex - 1];
+		objects.push_back(new Sphere(id, matIndex,material, cIndex, R, &vertices,SphereType));
 
 		pObject = pObject->NextSiblingElement("Sphere");
 	}
@@ -369,8 +369,8 @@ void Scene::readXML(const char* xmlPath)
 		objElement = pObject->FirstChildElement("Indices");
 		str = objElement->GetText();
 		sscanf(str, "%d %d %d", &p1Index, &p2Index, &p3Index);
-
-		objects.push_back(new Triangle(id, matIndex, p1Index, p2Index, p3Index, &vertices,TriangleShape));
+		Material* material = materials[matIndex-1];
+		objects.push_back(new Triangle(id, matIndex,material, p1Index, p2Index, p3Index, &vertices,TriangleShape));
 
 		pObject = pObject->NextSiblingElement("Triangle");
 	}
@@ -412,13 +412,14 @@ void Scene::readXML(const char* xmlPath)
 				while (str[cursor] == ' ' || str[cursor] == '\t' || str[cursor] == '\n')
 					cursor++;
 			}
-			faces.push_back(*(new Triangle(-1, matIndex, p1Index, p2Index, p3Index, &vertices,TriangleShape)));
+			Material* material = materials[matIndex - 1];
+			faces.push_back(*(new Triangle(-1, matIndex,material, p1Index, p2Index, p3Index, &vertices,TriangleShape)));
 			meshIndices->push_back(p1Index);
 			meshIndices->push_back(p2Index);
 			meshIndices->push_back(p3Index);
 		}
-
-		objects.push_back(new Mesh(id, matIndex, faces, meshIndices, &vertices,MeshType));
+		Material* material = materials[matIndex - 1];
+		objects.push_back(new Mesh(id, matIndex,material, faces, meshIndices, &vertices,MeshType));
 
 		pObject = pObject->NextSiblingElement("Mesh");
 	}
