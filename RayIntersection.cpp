@@ -56,17 +56,9 @@ ReturnVal RayIntersection::closestObject(Ray ray)
 	float* t = new float();
 	*t = 99999;
 	Node* node = boundingVolume->root;
-	//BoundingBoxIntersection(ray,node,t,returnValue);
-
-	/*if (returnValue.isIntersect)
-	{
-			closestObjectDistance = returnValue.t;
-			closestObjectReturnVal.hitNormal = returnValue.hitNormal;
-			closestObjectReturnVal.intersectionPoint = returnValue.intersectionPoint;
-			closestObjectReturnVal.objectID = returnValue.objectID;
-			closestObjectReturnVal.isIntersect = true;
-	}*/
-	//return *returnValue;
+	BoundingBoxIntersection(ray,node,t,returnValue);
+	
+	return *returnValue;
 	// Selecting Closest object to the camera
 
 	for (int o = 0; o < objectCount; o++)
@@ -83,7 +75,6 @@ ReturnVal RayIntersection::closestObject(Ray ray)
 				closestObjectReturnVal.objectID = o;
 				closestObjectReturnVal.isIntersect = true;
 				closestObjectReturnVal.t = closestObjectDistance;
-			
 			}
 		}
 	}

@@ -52,12 +52,16 @@ ReturnVal Sphere::intersect(const Ray & ray) const
         return returnValue;
 
     returnValue.isIntersect = true;
-    //float intersectionPoint1 = t + sqrt(delta);
+    float intersectionPoint1 = t + sqrt(delta);
     float intersectionPoint2 = t - sqrt(delta);
+	float point = intersectionPoint2 > 0 ? intersectionPoint2 : intersectionPoint1;
 	//float intersectionPoint = intersectionPoint1 < intersectionPoint2 ? intersectionPoint1 : intersectionPoint2;
-    returnValue.intersectionPoint =ray.getPoint(intersectionPoint2);
-	returnValue.t = intersectionPoint2;
-    returnValue.hitNormal = (ray.getPoint(intersectionPoint2) -center )/(this->radius);
+    returnValue.intersectionPoint =ray.getPoint(point);
+	returnValue.t = point;
+	if(intersectionPoint2>0)
+    returnValue.hitNormal = (ray.getPoint(point) - center )/(this->radius);
+	else
+		returnValue.hitNormal = ( center- ray.getPoint(point)) / (this->radius);
 
 
 //    cout <<ray.getPoint(intersectionPoint1)<<" " << ray.getPoint(intersectionPoint2)<<endl ;
@@ -189,8 +193,7 @@ ReturnVal Mesh::intersect(const Ray & ray) const
 
 	ReturnVal returnVal = {};
 	returnVal.isIntersect = false;
-	Vector3f cameraPosition = ray.getPoint(0);
-	float cameraDistance = INT_MAX;
+	float t =INT_MAX;
     for(int i = 0 ; i < size;i++)
     {
         ReturnVal tempReturnVal= faces[i].intersect(ray);
@@ -198,9 +201,9 @@ ReturnVal Mesh::intersect(const Ray & ray) const
 		if (tempReturnVal.isIntersect)
 		{
 			// Select closest of faces intersecting
-			Vector3f cameraDistanceVector = tempReturnVal.intersectionPoint - cameraPosition;
-			if(cameraDistanceVector.length() < cameraDistance){
-				cameraDistance = cameraDistanceVector.length();
+			if(tempReturnVal.t<t)
+			{
+				t = tempReturnVal.t;
 				returnVal = tempReturnVal;
 			}
 		}
