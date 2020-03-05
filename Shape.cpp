@@ -51,15 +51,16 @@ IntersectionInfo Sphere::intersect(const Ray & ray) const
     if(delta < 0 || t + sqrt(delta) <= 0)
         return returnValue;
 
-    returnValue.isIntersect = true;
+    
     float intersectionPoint1 = t + sqrt(delta);
     float intersectionPoint2 = t - sqrt(delta);
-	float point = intersectionPoint2 > 0 ? intersectionPoint2 : intersectionPoint1;
+	float intersectionPoint = intersectionPoint2 > 0 ? intersectionPoint2 : intersectionPoint1;
 	//float intersectionPoint = intersectionPoint1 < intersectionPoint2 ? intersectionPoint1 : intersectionPoint2;
-    returnValue.intersectionPoint =ray.getPoint(point);
-	returnValue.t = point;
+	returnValue.isIntersect = true;
+    returnValue.intersectionPoint =ray.getPoint(intersectionPoint);
+	returnValue.t = intersectionPoint;
 	returnValue.objectID = id ;
-    returnValue.hitNormal = (ray.getPoint(point) - center )/(this->radius);
+    returnValue.hitNormal = (ray.getPoint(intersectionPoint) - center )/(this->radius);
 	
 
 //    cout <<ray.getPoint(intersectionPoint1)<<" " << ray.getPoint(intersectionPoint2)<<endl ;
@@ -121,6 +122,7 @@ IntersectionInfo Triangle::intersect(const Ray & ray) const
 {
     IntersectionInfo returnValue ={};
     returnValue.isIntersect = false;
+	returnValue.objectID = -1;
     Vector3f rayDirection = ray.direction;
     Vector3f rayOrigin = ray.origin;
     float AMatrix[3][3] = {
@@ -129,7 +131,12 @@ IntersectionInfo Triangle::intersect(const Ray & ray) const
             {point1.y-point2.y, point1.y-point3.y, rayDirection.y},
             {point1.z-point2.z, point1.z-point3.z, rayDirection.z}
     };
-
+	float determinantA = determinant(AMatrix);
+	if (determinantA == 0)
+	{
+		returnValue.isIntersect = false; // maybe wrong;
+		return returnValue;
+	}
     float betaMatrix[3][3] = {
             {point1.x-rayOrigin.x, point1.x-point3.x, rayDirection.x},
             {point1.y-rayOrigin.y, point1.y-point3.y, rayDirection.y},
@@ -150,12 +157,7 @@ IntersectionInfo Triangle::intersect(const Ray & ray) const
             {point1.z-point2.z, point1.z-point3.z, point1.z-rayOrigin.z}
 
     };
-    float determinantA = determinant(AMatrix);
-    if(determinantA == 0)
-    {
-        returnValue.isIntersect = false; // maybe wrong;
-        return returnValue;
-    }
+ 
 
     float beta = determinant(betaMatrix)/determinantA;
     float gamma = determinant(gammaMatrix)/determinantA;

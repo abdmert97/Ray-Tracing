@@ -83,13 +83,13 @@ inline Vector3f operator-(Vector3f v1,Vector3f v2)
         Vector3f resultVector{v1.x-v2.x,v1.y-v2.y,v1.z-v2.z};
         return resultVector;
     }
-inline Vector3f operator*( Vector3f  p, float f)
+inline Vector3f operator*( Vector3f p, float f)
 {
     Vector3f resultVector  ={f*p.x,f*p.y,f*p.z};
 
  return resultVector;
 }
-inline Vector3f operator*( Vector3f  u, Vector3f v)
+inline Vector3f operator*( Vector3f u, Vector3f v)
 {
     Vector3f resultVector  ={u.y*v.z - u.z*v.y,
                              u.z*v.x - u.x*v.z,

@@ -41,6 +41,7 @@ Color Shading::shading(int depth, Shape*& shape, IntersectionInfo& closestObject
 			
 			calculateColor(closestObjectInfo, material, light, lightVector, cameraVectorNormalized, shaders);
 			color = color + shaders;
+
 		}
 	}
 	

@@ -77,6 +77,9 @@ void Scene::renderImage(Camera* camera, Image* image)
 			{
 				// Set background Color 
 				Color background = { (unsigned char)backgroundColor.r,(unsigned char)backgroundColor.g,(unsigned char)backgroundColor.b };
+				background.red = background.red > 255 ? 255 : background.red;
+				background.grn = background.grn > 255 ? 255 : background.grn;
+				background.blu = background.blu > 255 ? 255 : background.blu;
 				image->setPixelValue(w, h, background);
 			}
 			else // if ray hits an object
@@ -86,8 +89,11 @@ void Scene::renderImage(Camera* camera, Image* image)
 
 				shape = objects[closestObjectReturnVal.objectID];
 				Color shadingColor = shading->shading(maxRecursionDepth, shape, closestObjectReturnVal, ray);
-
 				//  cout<<(int)color.red<< " "<<(int)color.grn<< " "<<(int)color.blu<< " "<<endl;
+				shadingColor.red = shadingColor.red > 255 ? 255 : shadingColor.red;
+				shadingColor.grn = shadingColor.grn > 255 ? 255 : shadingColor.grn;
+				shadingColor.blu = shadingColor.blu > 255 ? 255 : shadingColor.blu;
+				
 				image->setPixelValue(w, h, shadingColor);
 			}
 		}
@@ -114,7 +120,7 @@ void Scene::renderImagePart(int part, Camera* camera, Image* image)
 				if (closestObjectReturnVal.objectID == -1) // ray hits nothing
 				{
 					// Set background Color 
-					Color background = { (unsigned char)backgroundColor.r,(unsigned char)backgroundColor.g,(unsigned char)backgroundColor.b };
+					Color background = { (unsigned int)backgroundColor.r,(unsigned int)backgroundColor.g,(unsigned int)backgroundColor.b };
 					image->setPixelValue(w, h, background);
 				}
 				else // if ray hits an object
@@ -261,12 +267,7 @@ void Scene::readXML(const char* xmlPath)
 			str = materialElement->GetText();
 			sscanf(str, "%f %f %f", &materials[curr]->mirrorRef.r, &materials[curr]->mirrorRef.g, &materials[curr]->mirrorRef.b);
 		}
-		else
-		{
-			materials[curr]->mirrorRef.r = 0.0;
-			materials[curr]->mirrorRef.g = 0.0;
-			materials[curr]->mirrorRef.b = 0.0;
-		}
+	
 
 		materialElement = pMaterial->FirstChildElement("AbsorptionCoefficient");
 		if (materialElement != nullptr)
@@ -274,12 +275,7 @@ void Scene::readXML(const char* xmlPath)
 			str = materialElement->GetText();
 			sscanf(str, "%f %f %f", &materials[curr]->absorptionCoefficient.r, &materials[curr]->absorptionCoefficient.g, &materials[curr]->absorptionCoefficient.b);
 		}
-		else
-		{
-			materials[curr]->absorptionCoefficient.r = 0.0;
-			materials[curr]->absorptionCoefficient.g = 0.0;
-			materials[curr]->absorptionCoefficient.b = 0.0;
-		}
+
 		
 		materialElement = pMaterial->FirstChildElement("PhongExponent");
 		if (materialElement != nullptr)
@@ -460,9 +456,9 @@ void Scene::setScene()
 	for (int i = 0; i < materials.size(); i++)
 	{
 		Material mat = *materials[i];
-		ambientLightList[i].red = (unsigned char)(mat.ambientRef.x * ambientLight.x);
-		ambientLightList[i].grn = (unsigned char)(mat.ambientRef.y * ambientLight.y);
-		ambientLightList[i].blu = (unsigned char)(mat.ambientRef.z * ambientLight.z);
+		ambientLightList[i].red = (unsigned int)(mat.ambientRef.x * ambientLight.x);
+		ambientLightList[i].grn = (unsigned int)(mat.ambientRef.y * ambientLight.y);
+		ambientLightList[i].blu = (unsigned int)(mat.ambientRef.z * ambientLight.z);
 	}
 	cameraCount = cameras.size();
 }

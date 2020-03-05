@@ -30,8 +30,8 @@ public:
 		  backgroundColor(background_color)
 	{
 	}
-
-	void getReflection(int depth, IntersectionInfo& closestObjectReturnVal, Material material, Color& color,
+	Vector3f reflect(const Vector3f& incoming, const Vector3f& normal);
+	void getReflection(int depth, IntersectionInfo& intersectionInfo, Material material, Color& color,
 	                   Vector3f cameraVectorNormalized);
 };
 #endif

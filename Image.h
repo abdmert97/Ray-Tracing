@@ -14,9 +14,9 @@ typedef union Color
 {
     struct
     {
-        unsigned char red;
-        unsigned char grn;
-        unsigned char blu;
+        unsigned int red;
+        unsigned int grn;
+        unsigned int blu;
     };
 	Color operator+(Color c)
 	{
@@ -28,33 +28,22 @@ typedef union Color
 	Color operator+(Vector3f colorVector)
 	{
 		Color color = { red,grn,blu };
-		if ((int)color.red + colorVector.x > 255)
-			color.red = (char)255;
-		else
-			color.red += (char)colorVector.x;
-
-		if ((int)color.grn + colorVector.y > 255)
-			color.grn = (char)255;
-		else
-			color.grn += (char)colorVector.y;
-
-		if ((int)color.blu + colorVector.z > 255)
-			color.blu = (char)255;
-		else
-			color.blu += (char)colorVector.z;
+			color.red += (unsigned int)colorVector.x;
+			color.grn += (unsigned int)colorVector.y;
+			color.blu += (unsigned int)colorVector.z;
 		return color;
 	}
 	Color operator*(float c)
 	{
 
-		return Color{ (unsigned char)(red * c),(unsigned char)(grn * c),(unsigned char)(blu * c) };
+		return Color{ (unsigned int)(red * c),(unsigned int)(grn * c),(unsigned int)(blu * c) };
 	}
 	ostream& operator<<(ostream& os)
 	{
 		return os << "red: " << red << " green: " << grn << " blue: " << blu << endl;
 
 	}
-    unsigned char channel[3];
+    unsigned int channel[3];
 } Color;
 
 /* This class is provided to you for defining an image as a variable, manipulate it easily, and save it as a ppm file. */
