@@ -41,13 +41,13 @@ public:
 
 private:
 	bool isShadow(Vector3f& lightPosition, Vector3f& intersectionPoint)const;
-	void calculateColor(ReturnVal& closestObjectReturnVal, Material material, PointLight* light, Vector3f lightVector,
+	void calculateColor(IntersectionInfo& closestObjectInfo, Material material, PointLight* light, Vector3f lightVector,
 	Vector3f cameraVectorNormalized, Vector3f& shaders) const;
 	Vector3f blinnPhongShading(Vector3f lightRayVector, Vector3f& cameraRayVector, Material& material,
 	Vector3f& lightIntensity, Vector3f& normal) const;
 	Vector3f diffuseShading(Vector3f lightRayVector, Material& material, Vector3f& lightIntensity, Vector3f& normal)const;
 public:
-	Color shading(int depth, Shape*& shape, ReturnVal& closestObjectReturnVal, Ray& ray, float n_t =1);
+	Color shading(int depth, Shape*& shape, IntersectionInfo& closestObjectInfo, Ray& ray, float n_t =1);
 	
 };
 

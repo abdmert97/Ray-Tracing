@@ -113,14 +113,14 @@ inline ostream& operator<<(ostream& os, const Vector3f v  )
 
     }
 
-typedef struct ReturnVal
+typedef struct IntersectionInfo
 {
     bool isIntersect;
     Vector3f intersectionPoint;
     float t;
     Vector3f hitNormal;
 	int objectID;
-} ReturnVal;
+} IntersectionInfo;
 
 
 static float determinant(float matrix[3][3])

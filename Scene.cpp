@@ -55,12 +55,11 @@ void Scene::renderScene(void)
 		//renderImage(camera, image);
 		image->saveImage(cameras[i]->imageName);
 	}
-
 }
 void Scene::renderImage(Camera* camera, Image* image)
 {
 	ImagePlane imagePlane = camera->imgPlane;
-	ReturnVal returnValue;
+	IntersectionInfo returnValue;
 	Shape* shape;
 	Color color = { 0,0,0 };
 	int maxWidth = (imagePlane.nx);
@@ -73,25 +72,24 @@ void Scene::renderImage(Camera* camera, Image* image)
 			Ray ray = camera->getPrimaryRay(w, h);
 
 			// Selecting Closest object to the camera
-			ReturnVal closestObjectReturnVal = rayIntersection->closestObject(ray);
+			IntersectionInfo closestObjectReturnVal = rayIntersection->closestObject(ray);
 			if (closestObjectReturnVal.objectID == -1) // ray hits nothing
 			{
 				// Set background Color 
-				Color color2 = { (unsigned char)backgroundColor.r,(unsigned char)backgroundColor.g,(unsigned char)backgroundColor.b };
-				image->setPixelValue(w, h, color2);
+				Color background = { (unsigned char)backgroundColor.r,(unsigned char)backgroundColor.g,(unsigned char)backgroundColor.b };
+				image->setPixelValue(w, h, background);
 			}
 			else // if ray hits an object
 			{
-				color = { 0,0,0 };
+				
 				// start Shading a object
 
 				shape = objects[closestObjectReturnVal.objectID];
-				Color color2 = shading->shading(maxRecursionDepth, shape, closestObjectReturnVal, ray);
+				Color shadingColor = shading->shading(maxRecursionDepth, shape, closestObjectReturnVal, ray);
 
 				//  cout<<(int)color.red<< " "<<(int)color.grn<< " "<<(int)color.blu<< " "<<endl;
-				image->setPixelValue(w, h, color2);
+				image->setPixelValue(w, h, shadingColor);
 			}
-
 		}
 	}
 }
@@ -99,7 +97,7 @@ void Scene::renderImagePart(int part, Camera* camera, Image* image)
 {
 
 		ImagePlane imagePlane = camera->imgPlane;
-		ReturnVal returnValue;
+		IntersectionInfo returnValue;
 		Shape* shape;
 		Color color = { 0,0,0 };
 		int maxWidth = (imagePlane.nx / 8) * (part + 1);
@@ -112,25 +110,22 @@ void Scene::renderImagePart(int part, Camera* camera, Image* image)
 				Ray ray = camera->getPrimaryRay(w, h);
 				
 				// Selecting Closest object to the camera
-				ReturnVal closestObjectReturnVal = rayIntersection->closestObject(ray);
+				IntersectionInfo closestObjectReturnVal = rayIntersection->closestObject(ray);
 				if (closestObjectReturnVal.objectID == -1) // ray hits nothing
 				{
 					// Set background Color 
-					Color color2 = { (unsigned char)backgroundColor.r,(unsigned char)backgroundColor.g,(unsigned char)backgroundColor.b };
-					image->setPixelValue(w, h, color2);
+					Color background = { (unsigned char)backgroundColor.r,(unsigned char)backgroundColor.g,(unsigned char)backgroundColor.b };
+					image->setPixelValue(w, h, background);
 				}
 				else // if ray hits an object
 				{
-					color = { 0,0,0 };
 					// start Shading a object
-
 					shape = objects[closestObjectReturnVal.objectID];
-					Color color2 = shading->shading(maxRecursionDepth, shape, closestObjectReturnVal, ray);
+					Color color = shading->shading(maxRecursionDepth, shape, closestObjectReturnVal, ray);
 
 					//  cout<<(int)color.red<< " "<<(int)color.grn<< " "<<(int)color.blu<< " "<<endl;
-					image->setPixelValue(w, h, color2);
+					image->setPixelValue(w, h, color);
 				}
-			
 			}
 		}
 }
@@ -348,7 +343,7 @@ void Scene::readXML(const char* xmlPath)
 		objElement = pObject->FirstChildElement("Radius");
 		eResult = objElement->QueryFloatText(&R);
 		Material* material = materials[matIndex - 1];
-		objects.push_back(new Sphere(id, matIndex,material, cIndex, R, &vertices,SphereType));
+		objects.push_back(new Sphere(id-1, matIndex-1,material, cIndex, R, &vertices,SphereType));
 
 		pObject = pObject->NextSiblingElement("Sphere");
 	}
@@ -370,7 +365,7 @@ void Scene::readXML(const char* xmlPath)
 		str = objElement->GetText();
 		sscanf(str, "%d %d %d", &p1Index, &p2Index, &p3Index);
 		Material* material = materials[matIndex-1];
-		objects.push_back(new Triangle(id, matIndex,material, p1Index, p2Index, p3Index, &vertices,TriangleShape));
+		objects.push_back(new Triangle(id-1, matIndex-1,material, p1Index, p2Index, p3Index, &vertices,TriangleShape));
 
 		pObject = pObject->NextSiblingElement("Triangle");
 	}
@@ -413,13 +408,13 @@ void Scene::readXML(const char* xmlPath)
 					cursor++;
 			}
 			Material* material = materials[matIndex - 1];
-			faces.push_back(*(new Triangle(-1, matIndex,material, p1Index, p2Index, p3Index, &vertices,TriangleShape)));
+			faces.push_back(*(new Triangle(-1, matIndex-1,material, p1Index, p2Index, p3Index, &vertices,TriangleShape)));
 			meshIndices->push_back(p1Index);
 			meshIndices->push_back(p2Index);
 			meshIndices->push_back(p3Index);
 		}
 		Material* material = materials[matIndex - 1];
-		objects.push_back(new Mesh(id, matIndex,material, faces, meshIndices, &vertices,MeshType));
+		objects.push_back(new Mesh(id-1, matIndex-1,material, faces, meshIndices, &vertices,MeshType));
 
 		pObject = pObject->NextSiblingElement("Mesh");
 	}

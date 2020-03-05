@@ -25,7 +25,7 @@ public:
 	BoundingBox* bounds;
 	Material* material;
 	
-	virtual ReturnVal intersect(const Ray & ray) const = 0; // Pure virtual method for intersection test. You must implement this for sphere, triangle, and mesh.
+	virtual IntersectionInfo intersect(const Ray & ray) const = 0; // Pure virtual method for intersection test. You must implement this for sphere, triangle, and mesh.
 	virtual BoundingBox* getBounds();
     Shape(void);
 	Shape(int id, int matIndex, Material* material, ShapeType type); // Constructor
@@ -40,7 +40,7 @@ class Sphere: public Shape
 public:
 	Sphere(void);	// Constructor
 	Sphere(int id, int matIndex, Material* material, int cIndex, float R, vector<Vector3f> *vertices,ShapeType type);	// Constructor
-	ReturnVal intersect(const Ray & ray) const;	// Will take a ray and return a structure related to the intersection information. You will implement this.
+	IntersectionInfo intersect(const Ray & ray) const;	// Will take a ray and return a structure related to the intersection information. You will implement this.
 	BoundingBox* getBounds();
 private:
 	Vector3f center;
@@ -54,7 +54,7 @@ class Triangle: public Shape
 public:
 	Triangle(void);	// Constructor
 	Triangle(int id, int matIndex, Material* material, int p1Index, int p2Index, int p3Index, vector<Vector3f> *vertices, ShapeType type);	// Constructor
-	ReturnVal intersect(const Ray & ray) const; // Will take a ray and return a structure related to the intersection information. You will implement this.
+	IntersectionInfo intersect(const Ray & ray) const; // Will take a ray and return a structure related to the intersection information. You will implement this.
 	BoundingBox* getBounds();
 private:
     Vector3f point1;
@@ -68,7 +68,7 @@ class Mesh: public Shape
 public:
 	Mesh(void);	// Constructor
 	Mesh(int id, int matIndex, Material* material, const vector<Triangle>& faces, vector<int> *pIndices, vector<Vector3f> *vertices, ShapeType type);	// Constructor
-	ReturnVal intersect(const Ray & ray) const; // Will take a ray and return a structure related to the intersection information. You will implement this.
+	IntersectionInfo intersect(const Ray & ray) const; // Will take a ray and return a structure related to the intersection information. You will implement this.
 	BoundingBox* getBounds();
 private:
 	 const vector<Triangle> faces;

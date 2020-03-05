@@ -71,7 +71,7 @@ Vector3f Refraction::reflect(const Vector3f& incoming, const Vector3f& normal)
 }
 
 
-void Refraction::refraction(int depth, Ray ray,ReturnVal& intersection,Material material, Color& color,Vector3f rayDirection,float n_i)
+void Refraction::refraction(int depth, Ray ray,IntersectionInfo& intersection,Material material, Color& color,Vector3f rayDirection,float n_i)
 {
 	Color refractionColor{0,0,0};
 	
@@ -91,7 +91,7 @@ void Refraction::refraction(int depth, Ray ray,ReturnVal& intersection,Material 
 
 		Shape* intersectShape = objects[intersection.objectID];
 		Ray* reflectionRay = new Ray(refractionRayOrig, refractionDirection);
-		ReturnVal refractionIntersect = rayIntersection->closestObject(*reflectionRay);
+		IntersectionInfo refractionIntersect = rayIntersection->closestObject(*reflectionRay);
 		if(refractionIntersect.isIntersect)
 		{
 			Shape* refractionShape = objects[refractionIntersect.objectID];

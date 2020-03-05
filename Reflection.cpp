@@ -1,7 +1,7 @@
 
 #include "Reflection.h"
 
-void Reflection::getReflection(int depth, ReturnVal& closestObjectReturnVal, Material material, Color& color, Vector3f cameraVectorNormalized)
+void Reflection::getReflection(int depth, IntersectionInfo& closestObjectReturnVal, Material material, Color& color, Vector3f cameraVectorNormalized)
 {
 	
 	if (material.materialType != Default)
@@ -10,7 +10,7 @@ void Reflection::getReflection(int depth, ReturnVal& closestObjectReturnVal, Mat
 		Vector3f reflectionDirection = (cameraVectorNormalized * -1 + closestObjectReturnVal.hitNormal * (closestObjectReturnVal.hitNormal.dotProduct(cameraVectorNormalized)) * 2).normalizeVector();
 		Ray* reflectionRay = new Ray(closestObjectReturnVal.intersectionPoint + reflectionDirection * shadowRayEps, reflectionDirection);
 
-		ReturnVal closestReflection = rayIntersection->closestObject(*reflectionRay);
+		IntersectionInfo closestReflection = rayIntersection->closestObject(*reflectionRay);
 
 		if (closestReflection.isIntersect)
 		{

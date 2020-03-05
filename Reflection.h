@@ -31,7 +31,7 @@ public:
 	{
 	}
 
-	void getReflection(int depth, ReturnVal& closestObjectReturnVal, Material material, Color& color,
+	void getReflection(int depth, IntersectionInfo& closestObjectReturnVal, Material material, Color& color,
 	                   Vector3f cameraVectorNormalized);
 };
 #endif

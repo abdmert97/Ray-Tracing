@@ -4,7 +4,7 @@
 
 
 
-ReturnVal RayIntersection::BoundingBoxIntersection(Ray ray,Node *node,float *t_min,ReturnVal* retVal)
+IntersectionInfo RayIntersection::BoundingBoxIntersection(Ray ray,Node *node,float *t_min,IntersectionInfo* retVal)
 {
 	float* t = new float();
 
@@ -21,8 +21,8 @@ ReturnVal RayIntersection::BoundingBoxIntersection(Ray ray,Node *node,float *t_m
 		Shape* leftShape = objects[node->start];
 		Shape* rightShape = objects[node->end];
 
-		ReturnVal leftVal = leftShape->intersect(ray);
-		ReturnVal rightVal = rightShape->intersect(ray);
+		IntersectionInfo leftVal = leftShape->intersect(ray);
+		IntersectionInfo rightVal = rightShape->intersect(ray);
 		if (leftVal.isIntersect)
 		{
 			if (leftVal.t < *t_min)
@@ -45,14 +45,15 @@ ReturnVal RayIntersection::BoundingBoxIntersection(Ray ray,Node *node,float *t_m
 	return *retVal;
 }
 
-ReturnVal RayIntersection::closestObject(Ray ray)
+IntersectionInfo RayIntersection::closestObject(Ray ray)
 {
+	
 	Shape* shape;
 	float closestObjectDistance = INT_MAX;
-	ReturnVal closestObjectReturnVal = {};
+	IntersectionInfo closestObjectReturnVal = {};
 	closestObjectReturnVal.objectID = -1;
 	closestObjectReturnVal.isIntersect = false;
-	ReturnVal* returnValue = new ReturnVal();
+	IntersectionInfo* returnValue = new IntersectionInfo();
 	returnValue->objectID = -1;
 	float* t = new float();
 	*t = 99999;
@@ -61,7 +62,7 @@ ReturnVal RayIntersection::closestObject(Ray ray)
 	
 	return *returnValue;
 	// Selecting Closest object to the camera
-
+	
 	for (int o = 0; o < objectCount; o++)
 	{
 		shape = objects[o];

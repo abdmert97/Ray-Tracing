@@ -23,10 +23,10 @@ public:
 	{
 	}
 
-	void updateRetVal(ReturnVal& retVal,const ReturnVal& newVal);
-	ReturnVal BoundingBoxIntersection(Ray ray, Node* node, float *t_min, ReturnVal* retVal);
-	ReturnVal closestObject(Ray ray);
-	ReturnVal closestObjectRefraction(Ray ray, Shape* shape);
+	void updateRetVal(IntersectionInfo& retVal,const IntersectionInfo& newVal);
+	IntersectionInfo BoundingBoxIntersection(Ray ray, Node* node, float *t_min, IntersectionInfo* retVal);
+	IntersectionInfo closestObject(Ray ray);
+	IntersectionInfo closestObjectRefraction(Ray ray, Shape* shape);
 };
 
 #endif

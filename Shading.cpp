@@ -1,47 +1,45 @@
 #include "Shading.h"
 #include "Light.h"
 #include "Scene.h"
-int shadowcount = 0;
 
-Color Shading::shading(int depth, Shape*& shape, ReturnVal& closestObjectReturnVal, Ray& ray,float n_t)
+
+Color Shading::shading(int depth, Shape*& shape, IntersectionInfo& closestObjectInfo, Ray& ray,float n_t)
 {
+	// If depth is less then zero stop shading
 	if (depth < 0)
 	{
 		Color color = { 0,0,0 };
 		return color;
 	}
-	shadowcount++;
-	Material material = *materials[shape->matIndex - 1];
-	// ambient diffuse specular yapma obje içindeyse
-	// ray ve normal ayný yöndeyse yapma
-	bool isInside = ray.direction.dotProduct(closestObjectReturnVal.hitNormal) > 0;
+	
+	Material material = *materials[shape->matIndex];
+
+	bool isInside = ray.direction.dotProduct(closestObjectInfo.hitNormal) > 0;
 	
 	Color color = { 0,0,0 };
-	Vector3f cameraVector = (ray.origin - closestObjectReturnVal.intersectionPoint);
+	Vector3f cameraVector = (ray.origin - closestObjectInfo.intersectionPoint);
 	Vector3f cameraVectorNormalized = cameraVector.normalizeVector();
 	if(!isInside)
 	{
-		color = ambientLightList[shape->matIndex - 1];
-
+		color = ambientLightList[shape->matIndex];
 
 		PointLight* light;
 		Vector3f lightVector;
 		
-	
 		for (int l = 0; l < lightCount; l++)
 		{
 			light = lights[l];
-			lightVector = (light->position - closestObjectReturnVal.intersectionPoint);
+			lightVector = (light->position - closestObjectInfo.intersectionPoint);
 			// Shadows
 			Vector3f lightPosition = light->position;
-			if (isShadow(lightPosition, closestObjectReturnVal.intersectionPoint))
+			if (isShadow(lightPosition, closestObjectInfo.intersectionPoint))
 			{
 				continue;
 			}
 			// Shading
 			Vector3f shaders;
 			
-			calculateColor(closestObjectReturnVal, material, light, lightVector, cameraVectorNormalized, shaders);
+			calculateColor(closestObjectInfo, material, light, lightVector, cameraVectorNormalized, shaders);
 			color = color + shaders;
 		}
 	}
@@ -51,18 +49,19 @@ Color Shading::shading(int depth, Shape*& shape, ReturnVal& closestObjectReturnV
 	if (material.materialType == Default)
 		return color;
 	if (material.materialType == Mirror)
-		reflection->getReflection(depth, closestObjectReturnVal, material, color, cameraVectorNormalized);
+		reflection->getReflection(depth, closestObjectInfo, material, color, cameraVectorNormalized);
 	else
-		refraction->refraction(depth, ray, closestObjectReturnVal, material, color,ray.direction,n_t);
+		refraction->refraction(depth, ray, closestObjectInfo, material, color,ray.direction,n_t);
 	return color;
 }
 bool Shading::isShadow(Vector3f& lightPosition, Vector3f& intersectionPoint)const
 {
 	Vector3f lightVector = lightPosition - intersectionPoint;
+	
 	Ray* shadowRay = new Ray((intersectionPoint + lightVector.normalizeVector() * shadowRayEps), lightVector.normalizeVector());
 	Ray* shadowRay_ = new Ray(intersectionPoint, lightVector.normalizeVector());
 	float tFromIntersectionToLight = shadowRay_->gett(lightPosition);
-	ReturnVal returnVal;
+	IntersectionInfo returnVal;
 	Shape* shadowShape;
 	for (int o = 0; o < objectCount; o++) {
 		shadowShape = objects[o];
@@ -77,13 +76,13 @@ bool Shading::isShadow(Vector3f& lightPosition, Vector3f& intersectionPoint)cons
 	}
 	return false;
 }
-void Shading::calculateColor(ReturnVal& closestObjectReturnVal, Material material, PointLight* light, Vector3f lightVector, Vector3f cameraVectorNormalized, Vector3f& shaders) const
+void Shading::calculateColor(IntersectionInfo& closestObjectInfo, Material material, PointLight* light, Vector3f lightVector, Vector3f cameraVectorNormalized, Vector3f& shaders) const
 {
 	Vector3f lightVectorNormalized = lightVector.normalizeVector();
-	Vector3f intensity = light->computeLightContribution(closestObjectReturnVal.intersectionPoint);
+	Vector3f intensity = light->computeLightContribution(closestObjectInfo.intersectionPoint);
 	shaders = { 0,0,0 };
-	Vector3f blinnPhongShade = blinnPhongShading(lightVectorNormalized, cameraVectorNormalized, material, intensity, closestObjectReturnVal.hitNormal);
-	Vector3f diffuseShade = diffuseShading(lightVectorNormalized, material, intensity, closestObjectReturnVal.hitNormal);
+	Vector3f blinnPhongShade = blinnPhongShading(lightVectorNormalized, cameraVectorNormalized, material, intensity, closestObjectInfo.hitNormal);
+	Vector3f diffuseShade = diffuseShading(lightVectorNormalized, material, intensity, closestObjectInfo.hitNormal);
 	shaders = diffuseShade + blinnPhongShade;
 }
 Vector3f Shading::blinnPhongShading(Vector3f lightRayVector, Vector3f& cameraRayVector, Material& material, Vector3f& lightIntensity, Vector3f& normal)const
