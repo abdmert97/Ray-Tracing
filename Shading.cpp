@@ -12,26 +12,40 @@ Color Shading::shading(int depth, Shape*& shape, ReturnVal& closestObjectReturnV
 	}
 	shadowcount++;
 	Material material = *materials[shape->matIndex - 1];
-	Color color = ambientLightList[shape->matIndex - 1];
-	PointLight* light;
-	Vector3f lightVector;
+	// ambient diffuse specular yapma obje içindeyse
+	// ray ve normal ayný yöndeyse yapma
+	bool isInside = ray.direction.dotProduct(closestObjectReturnVal.hitNormal) > 0;
+	
+	Color color = { 0,0,0 };
 	Vector3f cameraVector = (ray.origin - closestObjectReturnVal.intersectionPoint);
 	Vector3f cameraVectorNormalized = cameraVector.normalizeVector();
-	for (int l = 0; l < lightCount; l++)
+	if(!isInside)
 	{
-		light = lights[l];
-		lightVector = (light->position - closestObjectReturnVal.intersectionPoint);
-		// Shadows
-		Vector3f lightPosition = light->position;
-		if (isShadow(lightPosition, closestObjectReturnVal.intersectionPoint))
+		color = ambientLightList[shape->matIndex - 1];
+
+
+		PointLight* light;
+		Vector3f lightVector;
+		
+	
+		for (int l = 0; l < lightCount; l++)
 		{
-			continue;
+			light = lights[l];
+			lightVector = (light->position - closestObjectReturnVal.intersectionPoint);
+			// Shadows
+			Vector3f lightPosition = light->position;
+			if (isShadow(lightPosition, closestObjectReturnVal.intersectionPoint))
+			{
+				continue;
+			}
+			// Shading
+			Vector3f shaders;
+			
+			calculateColor(closestObjectReturnVal, material, light, lightVector, cameraVectorNormalized, shaders);
+			color = color + shaders;
 		}
-		// Shading
-		Vector3f shaders;
-		calculateColor(closestObjectReturnVal, material, light, lightVector, cameraVectorNormalized, shaders);
-		color = color + shaders;
 	}
+	
 
 	// Reflection
 	if (material.materialType == Default)
@@ -74,7 +88,7 @@ void Shading::calculateColor(ReturnVal& closestObjectReturnVal, Material materia
 }
 Vector3f Shading::blinnPhongShading(Vector3f lightRayVector, Vector3f& cameraRayVector, Material& material, Vector3f& lightIntensity, Vector3f& normal)const
 {
-	Vector3f halfVector = (lightRayVector + cameraRayVector) / ((lightRayVector + cameraRayVector).length());
+	Vector3f halfVector = (lightRayVector + cameraRayVector).normalizeVector();
 
 	float cosAlpha = halfVector.dotProduct(normal);
 

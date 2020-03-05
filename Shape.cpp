@@ -48,7 +48,7 @@ ReturnVal Sphere::intersect(const Ray & ray) const
     float z =  (origin-center).dotProduct(origin-center);
     float delta = x*x-y*(z-radius*radius);
 
-    if(delta < 0 || t <= 0)
+    if(delta < 0 || t + sqrt(delta) <= 0)
         return returnValue;
 
     returnValue.isIntersect = true;
@@ -58,11 +58,9 @@ ReturnVal Sphere::intersect(const Ray & ray) const
 	//float intersectionPoint = intersectionPoint1 < intersectionPoint2 ? intersectionPoint1 : intersectionPoint2;
     returnValue.intersectionPoint =ray.getPoint(point);
 	returnValue.t = point;
-	if(intersectionPoint2>0)
+	returnValue.objectID = id - 1;
     returnValue.hitNormal = (ray.getPoint(point) - center )/(this->radius);
-	else
-		returnValue.hitNormal = ( center- ray.getPoint(point)) / (this->radius);
-
+	
 
 //    cout <<ray.getPoint(intersectionPoint1)<<" " << ray.getPoint(intersectionPoint2)<<endl ;
     return returnValue;
@@ -162,8 +160,9 @@ ReturnVal Triangle::intersect(const Ray & ray) const
     float beta = determinant(betaMatrix)/determinantA;
     float gamma = determinant(gammaMatrix)/determinantA;
     float t = determinant(tMatrix)/determinantA;
-    if(beta+gamma<=1&&beta>=0&&gamma>=0&&t>0)
+    if(beta+gamma<=1&&beta>=0&&gamma>=0&&t>0.001)
     {
+		returnValue.objectID = id - 1;
         returnValue.isIntersect = true;
         returnValue.t = t;
         returnValue.intersectionPoint = ray.getPoint(t);
@@ -193,6 +192,7 @@ ReturnVal Mesh::intersect(const Ray & ray) const
 
 	ReturnVal returnVal = {};
 	returnVal.isIntersect = false;
+	returnVal.objectID = -1;
 	float t =INT_MAX;
     for(int i = 0 ; i < size;i++)
     {

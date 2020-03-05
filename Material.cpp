@@ -7,9 +7,7 @@ Material::Material(void)
 	Vector3f ambientRef = {0,0,0};	// Coefficients for ambient reflection
 	Vector3f diffuseRef = { 0,0,0 };	// Coefficients for diffuse reflection
 	Vector3f specularRef = { 0,0,0 };	// Coefficients for specular reflection
-	if(materialType == Default)
-		Vector3f mirrorRef = { 0,0,0 };		// Coefficients for mirror reflection
-	else
-		Vector3f mirrorRef = { 1,1,1 };
+	Vector3f mirrorRef = { 0,0,0 };		// Coefficients for mirror reflection
+	
 	refractionIndex = 1;
 }

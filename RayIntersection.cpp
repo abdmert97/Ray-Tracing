@@ -51,6 +51,7 @@ ReturnVal RayIntersection::closestObject(Ray ray)
 	float closestObjectDistance = INT_MAX;
 	ReturnVal closestObjectReturnVal = {};
 	closestObjectReturnVal.objectID = -1;
+	closestObjectReturnVal.isIntersect = false;
 	ReturnVal* returnValue = new ReturnVal();
 	returnValue->objectID = -1;
 	float* t = new float();
@@ -67,6 +68,7 @@ ReturnVal RayIntersection::closestObject(Ray ray)
 		*returnValue = shape->intersect(ray);
 		if (returnValue->isIntersect)
 		{
+			
 			float tValue = returnValue->t;
 			if (tValue < closestObjectDistance) {
 				closestObjectDistance = tValue;
@@ -81,46 +83,3 @@ ReturnVal RayIntersection::closestObject(Ray ray)
 	return closestObjectReturnVal;
 }
 
-ReturnVal RayIntersection::closestObjectRefraction(Ray ray,Shape * firstShape)
-{
-	Shape* shape;
-	float closestObjectDistance = INT_MAX;
-	ReturnVal closestObjectReturnVal = {};
-	closestObjectReturnVal.objectID = -1;
-	ReturnVal* returnValue = new ReturnVal();
-	returnValue->objectID = -1;
-	float* t = new float();
-	*t = 99999;
-	Node* node = boundingVolume->root;
-	//BoundingBoxIntersection(ray,node,t,returnValue);
-
-	/*if (returnValue.isIntersect)
-	{
-			closestObjectDistance = returnValue.t;
-			closestObjectReturnVal.hitNormal = returnValue.hitNormal;
-			closestObjectReturnVal.intersectionPoint = returnValue.intersectionPoint;
-			closestObjectReturnVal.objectID = returnValue.objectID;
-			closestObjectReturnVal.isIntersect = true;
-	}*/
-	//return *returnValue;
-	// Selecting Closest object to the camera
-
-	for (int o = 0; o < objectCount; o++)
-	{
-		shape = objects[o];
-		*returnValue = shape->intersect(ray);
-		if (returnValue->isIntersect)
-		{
-			float tValue = returnValue->t;
-			if (tValue < closestObjectDistance&& firstShape->id != shape->id) {
-				closestObjectDistance = tValue;
-				closestObjectReturnVal.hitNormal = returnValue->hitNormal;
-				closestObjectReturnVal.intersectionPoint = returnValue->intersectionPoint;
-				closestObjectReturnVal.objectID = o;
-				closestObjectReturnVal.isIntersect = true;
-				closestObjectReturnVal.t = tValue;
-			}
-		}
-	}
-	return closestObjectReturnVal;
-}

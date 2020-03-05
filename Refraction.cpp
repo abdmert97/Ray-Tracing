@@ -29,6 +29,7 @@ float Refraction::fresnel(const Vector3f& incoming, const Vector3f& normal, cons
 	if (cosi > 1) cosi = 1;
 	float  n_t = refractionIndex;
 	if (cosi > 0) { std::swap(n_i, n_t); }
+
 	// Compute sini using Snell's law
 	float sint = (n_i / n_t) * sqrtf(std::max(0.f, 1 - cosi * cosi));
 	// Total internal reflection
@@ -55,7 +56,9 @@ float Refraction::fresnel(const Vector3f& incoming, const Vector3f& normal, cons
 			kr = (Rs * Rs + Rp * Rp) / 2;
 		}
 		else
+		{
 			kr = (Rs + Rp) / 2;
+		}
 	}
 	
 	return kr;
@@ -68,19 +71,21 @@ Vector3f Refraction::reflect(const Vector3f& incoming, const Vector3f& normal)
 }
 
 
-void Refraction::refraction(int depth, Ray ray,ReturnVal intersection,Material material, Color& color,Vector3f rayDirection,float n_i)
+void Refraction::refraction(int depth, Ray ray,ReturnVal& intersection,Material material, Color& color,Vector3f rayDirection,float n_i)
 {
 	Color refractionColor{0,0,0};
 	
-	float n_t = material.refractionIndex == n_i ? 1 : material.refractionIndex;
+	float n_t =material.refractionIndex;
+	
 	float kr = fresnel(rayDirection, intersection.hitNormal, n_t,material,n_i);
 	//kt transmit
-	bool outside = ray.direction.dotProduct(intersection.hitNormal) <  0;
-	Vector3f bias = intersection.hitNormal*0.01;
 
-	Vector3f hitPoint = intersection.intersectionPoint;
-	if (kr < 1) {
 
+
+	if (material.materialType == Dialectic && kr < 1 ) {
+		Vector3f hitPoint = intersection.intersectionPoint;
+		bool outside = ray.direction.dotProduct(intersection.hitNormal) < 0;
+		Vector3f bias = intersection.hitNormal * 0.01;
 		Vector3f refractionDirection = refract(rayDirection, intersection.hitNormal,n_t,n_i).normalizeVector();
 		Vector3f refractionRayOrig = outside ? hitPoint - bias : hitPoint + bias;
 
@@ -90,33 +95,27 @@ void Refraction::refraction(int depth, Ray ray,ReturnVal intersection,Material m
 		if(refractionIntersect.isIntersect)
 		{
 			Shape* refractionShape = objects[refractionIntersect.objectID];
-			/*	if(material.materialType == Dialectic && intersectShape->id != refractionShape->id)
-			{
-				cout << " hsdfjkl" << endl;
-			}*/
-			refractionColor = shading->shading(depth - 1, refractionShape, refractionIntersect, *reflectionRay,n_t);
 			
-		}
-		else
-		{
-			refractionColor = { (unsigned char)(reflection->backgroundColor.r * material.mirrorRef.x),
-				(unsigned char)(reflection->backgroundColor.g * material.mirrorRef.y),
-				(unsigned char)(reflection->backgroundColor.b * material.mirrorRef.z) };
+			refractionColor = shading->shading(depth - 1, refractionShape, refractionIntersect, *reflectionRay,n_i);
+			
 		}
 		
 	}
 
 
-	Color reflectionColor = {0,0,0};
+
+
 	if (material.materialType == Dialectic)
 	{
 		Vector3f abs = material.absorptionCoefficient;
-	
-		material.mirrorRef = {1-abs.r,1-abs.g,1-abs.b};
+
+		material.mirrorRef = { 1,1,1 };
 	}
-	
-	Vector3f cameraVector = (ray.origin - intersection.intersectionPoint);
-	reflection->getReflection(depth - 1, intersection, material, reflectionColor, cameraVector.normalizeVector());
+
+
+	Color reflectionColor = { 0,0,0 };
+	Vector3f cameraVector = (ray.origin - intersection.intersectionPoint).normalizeVector();
+	reflection->getReflection(depth, intersection, material, reflectionColor, cameraVector);
 
 	// mix the two
 	

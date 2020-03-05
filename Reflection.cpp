@@ -3,6 +3,7 @@
 
 void Reflection::getReflection(int depth, ReturnVal& closestObjectReturnVal, Material material, Color& color, Vector3f cameraVectorNormalized)
 {
+	
 	if (material.materialType != Default)
 	{
 		
@@ -18,7 +19,7 @@ void Reflection::getReflection(int depth, ReturnVal& closestObjectReturnVal, Mat
 			Color reflectanceColor = { 0,0,0 };
 
 			reflectanceColor = reflectanceColor + shading->shading((depth - 1), reflectionShape, closestReflection, *reflectionRay);
-
+		
 			reflectance = { reflectanceColor.red * reflectance.x,
 				reflectanceColor.grn * reflectance.y,
 				reflectanceColor.blu * reflectance.z };
@@ -28,7 +29,8 @@ void Reflection::getReflection(int depth, ReturnVal& closestObjectReturnVal, Mat
 		else
 		{
 
-			Color reflectanceColor = { (unsigned char)(backgroundColor.r * material.mirrorRef.x),
+			Color reflectanceColor = {
+				(unsigned char)(backgroundColor.r * material.mirrorRef.x),
 				(unsigned char)(backgroundColor.g * material.mirrorRef.y),
 				(unsigned char)(backgroundColor.b * material.mirrorRef.z) };
 			color = color + reflectanceColor;
