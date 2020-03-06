@@ -30,6 +30,7 @@ Vector3f BoundingBox::getMax(Vector3f v1, Vector3f v2)
 
 bool BoundingBox::isIntersect(Ray ray, float* t)
 {
+
 	float tmin = (min.x - ray.origin.x) / ray.direction.x;
 	float tmax = (max.x - ray.origin.x) / ray.direction.x;
 

@@ -112,7 +112,6 @@ void Scene::renderImagePart(int part, Camera* camera, Image* image)
 
 			for (int h = 0; h < imagePlane.ny; h++)
 			{
-
 				Ray ray = camera->getPrimaryRay(w, h);
 				
 				// Selecting Closest object to the camera

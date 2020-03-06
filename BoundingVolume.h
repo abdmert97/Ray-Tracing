@@ -3,7 +3,8 @@
 
 #include <utility>
 #include "Node.h"
-
+#include <vector>
+#include <algorithm>
 #include "Shape.h"
 #include <ctime>
 
@@ -24,7 +25,10 @@ public:
 
 	}
 
-	bool isInLeft(const Vector3f& midPoint, BoundingBox* bounding_box);
+	bool isInRight(const Vector3f& midPoint, BoundingBox* bounding_box);
+	bool sortVector(const Vector3f& v1, const Vector3f& v2);
+
+
 	void build(Node* node, int left, int right);
 };
 

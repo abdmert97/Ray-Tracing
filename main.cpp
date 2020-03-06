@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
 	
 
 	/* Do your stuff here */
-	const char *xmlPath = "hw2/cornellbox_recursive.xml" ;
+	const char *xmlPath = "hw1/scienceTree.xml" ;
     cout<< xmlPath<<endl;
 	clock_t tStart = clock();
 	for (int i = 0; i < 1; i++) 

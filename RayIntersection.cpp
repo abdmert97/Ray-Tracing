@@ -19,28 +19,33 @@ IntersectionInfo RayIntersection::BoundingBoxIntersection(Ray ray,Node *node,flo
 			BoundingBoxIntersection(ray, node->right, t_min, retVal);
 		}
 		Shape* leftShape = objects[node->start];
-		Shape* rightShape = objects[node->end];
+		
 
-		IntersectionInfo leftVal = leftShape->intersect(ray);
-		IntersectionInfo rightVal = rightShape->intersect(ray);
-		if (leftVal.isIntersect)
+		IntersectionInfo *leftVal = &leftShape->intersect(ray);
+		
+		if (leftVal->isIntersect)
 		{
-			if (leftVal.t < *t_min)
+			if (leftVal->t < *t_min)
 			{
-				*t_min = leftVal.t;
-				leftVal.objectID = node->start;
-				*retVal = leftVal;
+				*t_min = leftVal->t;
+				leftVal->objectID = node->start;
+				*retVal = *leftVal;
 			}
 		}
-		if (rightVal.isIntersect)
+		if (node->start != node->end)
 		{
-			if (rightVal.t < *t_min)
+			Shape* rightShape = objects[node->end];
+			IntersectionInfo *rightVal = &rightShape->intersect(ray);
+			if (rightVal->isIntersect)
 			{
-				*t_min = rightVal.t;
-				rightVal.objectID = node->end;
-				*retVal = rightVal;
+				if (rightVal->t < *t_min)
+				{
+					*t_min = rightVal->t;
+					rightVal->objectID = node->end;
+					*retVal = *rightVal;
+				}
 			}
-		}	
+		}
 	}
 	return *retVal;
 }

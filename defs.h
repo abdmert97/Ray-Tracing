@@ -31,6 +31,10 @@ typedef struct Vector3f
 		float z;
 		float b;
 	};
+	bool operator<(const Vector3f& a) const
+	{
+		return this->x < a.x;
+	}
 	 Vector3f operator=(Vector3f v2)
     {
         this->x = v2.x;
@@ -112,6 +116,7 @@ inline ostream& operator<<(ostream& os, const Vector3f v  )
         return os<<"x: " << v.x << " y: "<< v.y << " z: "<<v.z<<endl;
 
     }
+
 
 typedef struct IntersectionInfo
 {
