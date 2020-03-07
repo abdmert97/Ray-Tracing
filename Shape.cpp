@@ -164,13 +164,14 @@ IntersectionInfo Triangle::intersect(const Ray & ray) const
     float t = determinant(tMatrix)/determinantA;
     if(beta+gamma<=1&&beta>=0&&gamma>=0&&t>0.001)
     {
-		returnValue.objectID = id ;
+		returnValue.objectID = id;
         returnValue.isIntersect = true;
         returnValue.t = t;
         returnValue.intersectionPoint = ray.getPoint(t);
+		Vector3f crossProduct = (point2 - point1) * (point3 - point1);
+		returnValue.hitNormal = crossProduct.normalizeVector();
     }
-    Vector3f crossProduct =(point2-point1)*(point3-point1);
-    returnValue.hitNormal =  crossProduct.normalizeVector();
+
 
     return returnValue;
 }
@@ -199,7 +200,8 @@ IntersectionInfo Mesh::intersect(const Ray & ray) const
     for(int i = 0 ; i < size;i++)
     {
         IntersectionInfo tempReturnVal= faces[i].intersect(ray);
-
+		
+		tempReturnVal.objectID = id;
 		if (tempReturnVal.isIntersect)
 		{
 			// Select closest of faces intersecting
@@ -207,6 +209,7 @@ IntersectionInfo Mesh::intersect(const Ray & ray) const
 			{
 				t = tempReturnVal.t;
 				returnVal = tempReturnVal;
+				returnVal.isIntersect = true;
 			}
 		}
     }

@@ -23,13 +23,15 @@ public:
 	Node()
 	{
 		boundingBox = new BoundingBox();
+		left = nullptr;
+		right = nullptr;
 	}
 	Node(Node* left,Node *right)
 	{
 		this->left = left;
 		this->right = right;
 	}
-	BoundingBox* getBoundingBox(Node* left, Node* right);
+
 };
 #endif
 

@@ -15,6 +15,7 @@
 #include "RayIntersection.h"
 #include "Reflection.h"
 #include "BoundingVolume.h"
+#include "happly.h"
 class Shading;
 class RayIntersection;
 class Reflection;
@@ -52,6 +53,7 @@ public:
 	Scene(const char *xmlPath);		// Constructor. Parses XML file and initializes vectors above. Implemented for you.
 
 	void setScene();
+	void readPly(const char* fileName);
 	void threading(Camera* camera, Image* image);
 	
 	void renderScene(void);			// Method to render scene, an image is created for each camera in the scene. You will implement this.

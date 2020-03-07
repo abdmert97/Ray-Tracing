@@ -51,8 +51,8 @@ void Scene::renderScene(void)
 		ImagePlane imagePlane = camera->imgPlane;
 		Image* image = new Image(imagePlane.nx, imagePlane.ny);
 	
-		threading(camera, image);
-		//renderImage(camera, image);
+		//threading(camera, image);
+		renderImage(camera, image);
 		image->saveImage(cameras[i]->imageName);
 	}
 }
@@ -116,7 +116,7 @@ void Scene::renderImagePart(int part, Camera* camera, Image* image)
 				
 				// Selecting Closest object to the camera
 				IntersectionInfo closestObjectReturnVal = rayIntersection->closestObject(ray);
-				if (closestObjectReturnVal.objectID == -1) // ray hits nothing
+				if (closestObjectReturnVal.isIntersect == false) // ray hits nothing
 				{
 					// Set background Color 
 					Color background = { (unsigned int)backgroundColor.r,(unsigned int)backgroundColor.g,(unsigned int)backgroundColor.b };
@@ -319,7 +319,7 @@ void Scene::readXML(const char* xmlPath)
 
 	// Parse objects
 	pElement = pRoot->FirstChildElement("Objects");
-
+	int idCount = 0;
 	// Parse spheres
 	XMLElement* pObject = pElement->FirstChildElement("Sphere");
 	XMLElement* objElement;
@@ -338,7 +338,7 @@ void Scene::readXML(const char* xmlPath)
 		objElement = pObject->FirstChildElement("Radius");
 		eResult = objElement->QueryFloatText(&R);
 		Material* material = materials[matIndex - 1];
-		objects.push_back(new Sphere(id-1, matIndex-1,material, cIndex, R, &vertices,SphereType));
+		objects.push_back(new Sphere(idCount++, matIndex-1,material, cIndex, R, &vertices,SphereType));
 
 		pObject = pObject->NextSiblingElement("Sphere");
 	}
@@ -360,7 +360,7 @@ void Scene::readXML(const char* xmlPath)
 		str = objElement->GetText();
 		sscanf(str, "%d %d %d", &p1Index, &p2Index, &p3Index);
 		Material* material = materials[matIndex-1];
-		objects.push_back(new Triangle(id-1, matIndex-1,material, p1Index, p2Index, p3Index, &vertices,TriangleShape));
+		objects.push_back(new Triangle(idCount++, matIndex-1,material, p1Index, p2Index, p3Index, &vertices,TriangleShape));
 
 		pObject = pObject->NextSiblingElement("Triangle");
 	}
@@ -403,13 +403,13 @@ void Scene::readXML(const char* xmlPath)
 					cursor++;
 			}
 			Material* material = materials[matIndex - 1];
-			faces.push_back(*(new Triangle(-1, matIndex-1,material, p1Index, p2Index, p3Index, &vertices,TriangleShape)));
+			faces.push_back(*(new Triangle(id, matIndex-1,material, p1Index, p2Index, p3Index, &vertices,TriangleShape)));
 			meshIndices->push_back(p1Index);
 			meshIndices->push_back(p2Index);
 			meshIndices->push_back(p3Index);
 		}
 		Material* material = materials[matIndex - 1];
-		objects.push_back(new Mesh(id-1, matIndex-1,material, faces, meshIndices, &vertices,MeshType));
+		objects.push_back(new Mesh(idCount++, matIndex-1,material, faces, meshIndices, &vertices,MeshType));
 
 		pObject = pObject->NextSiblingElement("Mesh");
 	}
@@ -445,6 +445,7 @@ void Scene::readXML(const char* xmlPath)
 Scene::Scene(const char* xmlPath)
 {
 	readXML(xmlPath);
+	cout << "xml readed" << endl;
 	initObjects();
 }
 void Scene::setScene()
@@ -461,6 +462,15 @@ void Scene::setScene()
 	}
 	cameraCount = cameras.size();
 }
+void Scene::readPly(const char* fileName)
+{
+	happly::PLYData plyIn(fileName);
+
+
+	std::vector<std::array<double, 3>> vPos = plyIn.getVertexPositions();
+	std::vector<std::vector<size_t>> fInd = plyIn.getFaceIndices<size_t>();
+
+}
 void Scene::initObjects()
 {
 	setScene();
@@ -471,9 +481,10 @@ void Scene::initObjects()
 	reflection->shading = shading;
 	reflection->rayIntersection = rayIntersection;
 	refraction = new Refraction(reflection, shading, objects, rayIntersection);
-	shading->refraction = refraction;
-	
 	boundingVolume = new BoundingVolume(objects);
+	shading->refraction = refraction;
+	shading->rayIntersection = rayIntersection;
+
 	
 	rayIntersection->boundingVolume = boundingVolume;
 }

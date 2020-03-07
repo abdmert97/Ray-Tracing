@@ -3,89 +3,65 @@
 
 
 
-
-IntersectionInfo RayIntersection::BoundingBoxIntersection(Ray ray,Node *node,float *t_min,IntersectionInfo* retVal)
+void RayIntersection::BoundingBoxIntersection(Ray ray,Node *node,IntersectionInfo* retVal)
 {
-	float* t = new float();
 
-	if(node->boundingBox->isIntersect(ray,t))
+	float t_min = retVal->t;
+	
+	float t_intersection = node->boundingBox->isIntersect(ray);
+
+	if(t_intersection != -1)
 	{
+		
 		if(node->left != nullptr)
 		{
-			BoundingBoxIntersection(ray, node->left, t_min,retVal);
+			BoundingBoxIntersection(ray, node->left,retVal);
 		}
 		if(node->right != nullptr)
 		{
-			BoundingBoxIntersection(ray, node->right, t_min, retVal);
+			BoundingBoxIntersection(ray, node->right, retVal);
 		}
-		Shape* leftShape = objects[node->start];
-		
-
-		IntersectionInfo *leftVal = &leftShape->intersect(ray);
-		
-		if (leftVal->isIntersect)
+	
+		if(node->left == nullptr || node->right == nullptr)
 		{
-			if (leftVal->t < *t_min)
+		
+			for (int i = node->start; i <= node->end; i++)
 			{
-				*t_min = leftVal->t;
-				leftVal->objectID = node->start;
-				*retVal = *leftVal;
-			}
-		}
-		if (node->start != node->end)
-		{
-			Shape* rightShape = objects[node->end];
-			IntersectionInfo *rightVal = &rightShape->intersect(ray);
-			if (rightVal->isIntersect)
-			{
-				if (rightVal->t < *t_min)
+				Shape* shape = objects[i];
+				IntersectionInfo intesectionInfo = shape->intersect(ray);
+				if (intesectionInfo.isIntersect == true)
 				{
-					*t_min = rightVal->t;
-					rightVal->objectID = node->end;
-					*retVal = *rightVal;
+				
+					if (intesectionInfo.t <= t_min)
+					{
+						t_min = intesectionInfo.t;
+						intesectionInfo.objectID = i;
+						*retVal = intesectionInfo;
+					}
+					
 				}
 			}
 		}
 	}
-	return *retVal;
+	
+	
+	
 }
 
 IntersectionInfo RayIntersection::closestObject(Ray ray)
 {
 	
-	Shape* shape;
-	float closestObjectDistance = INT_MAX;
-	IntersectionInfo closestObjectReturnVal = {};
-	closestObjectReturnVal.objectID = -1;
-	closestObjectReturnVal.isIntersect = false;
-	IntersectionInfo* returnValue = new IntersectionInfo();
-	returnValue->objectID = -1;
-	float* t = new float();
-	*t = 99999;
-	Node* node = boundingVolume->root;
-	BoundingBoxIntersection(ray,node,t,returnValue);
+
+	IntersectionInfo returnValue{};
 	
-	return *returnValue;
+	float t = 9999;
+	returnValue.t = t;
+	Node* node = boundingVolume->root;
+	if(t>1)
+	BoundingBoxIntersection(ray,node,&returnValue);
+	
 	// Selecting Closest object to the camera
 	
-	for (int o = 0; o < objectCount; o++)
-	{
-		shape = objects[o];
-		*returnValue = shape->intersect(ray);
-		if (returnValue->isIntersect)
-		{
-			
-			float tValue = returnValue->t;
-			if (tValue < closestObjectDistance) {
-				closestObjectDistance = tValue;
-				closestObjectReturnVal.hitNormal = returnValue->hitNormal;
-				closestObjectReturnVal.intersectionPoint = returnValue->intersectionPoint;
-				closestObjectReturnVal.objectID = o;
-				closestObjectReturnVal.isIntersect = true;
-				closestObjectReturnVal.t = closestObjectDistance;
-			}
-		}
-	}
-	return closestObjectReturnVal;
+	return  returnValue;
 }
 

@@ -125,6 +125,25 @@ typedef struct IntersectionInfo
     float t;
     Vector3f hitNormal;
 	int objectID;
+
+	IntersectionInfo()
+	{
+		isIntersect = false;
+		objectID = -1;
+		intersectionPoint = { 0,0,0 };
+		t = -1;
+		hitNormal = { 0,0,0 };
+	}
+	IntersectionInfo operator=(IntersectionInfo rhs)
+	{
+		isIntersect = rhs.isIntersect;
+		intersectionPoint = rhs.intersectionPoint;
+		t = rhs.t;
+		hitNormal = rhs.hitNormal;
+		objectID = rhs.objectID;
+
+		return *this;
+	}
 } IntersectionInfo;
 
 

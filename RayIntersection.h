@@ -25,6 +25,7 @@ public:
 
 	void updateRetVal(IntersectionInfo& retVal,const IntersectionInfo& newVal);
 	IntersectionInfo BoundingBoxIntersection(Ray ray, Node* node, float *t_min, IntersectionInfo* retVal);
+	void BoundingBoxIntersection(Ray ray, Node* node, IntersectionInfo* retVal);
 	IntersectionInfo closestObject(Ray ray);
 	IntersectionInfo closestObjectRefraction(Ray ray, Shape* shape);
 };

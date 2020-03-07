@@ -9,14 +9,14 @@ int main(int argc, char *argv[])
 	
 
 	/* Do your stuff here */
-	const char *xmlPath = "hw1/scienceTree.xml" ;
+	const char *xmlPath = "hw2/spheres.xml" ;
     cout<< xmlPath<<endl;
 	clock_t tStart = clock();
 	for (int i = 0; i < 1; i++) 
 	{
 
 		pScene = new Scene(xmlPath);
-
+		//pScene->readPly("hw2/ply/dragon_remeshed.ply");
 		pScene->renderScene();
 		pScene->convertPPMToPNG(pScene->cameras[0]->imageName, 2);
 	}

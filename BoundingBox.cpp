@@ -15,34 +15,39 @@ void BoundingBox::extend(Shape* shape)
 
 Vector3f  BoundingBox::getMin(Vector3f v1, Vector3f v2)
 {
-	return Vector3f{ v1.x < v2.x ? v1.x : v2.x,
-					 v1.y < v2.y ? v1.y : v2.y,
-				     v1.z < v2.z ? v1.z : v2.z
+	return Vector3f{
+		{v1.x < v2.x ? v1.x : v2.x},
+		{v1.y < v2.y ? v1.y : v2.y},
+		{v1.z < v2.z ? v1.z : v2.z}
 	};
 }
 Vector3f BoundingBox::getMax(Vector3f v1, Vector3f v2)
 {
-	return Vector3f{ v1.x < v2.x ? v2.x : v1.x,
-					 v1.y < v2.y ? v2.y : v1.y,
-					 v1.z < v2.z ? v2.z : v1.z
+	return Vector3f{
+		{v1.x < v2.x ? v2.x : v1.x},
+		{v1 .y < v2.y ? v2.y : v1.y},
+		{v1.z < v2.z ? v2.z : v1.z}
 	};
 }
 
-bool BoundingBox::isIntersect(Ray ray, float* t)
+float BoundingBox::isIntersect(Ray ray)
 {
+	auto rayDirection = ray.direction;
 
-	float tmin = (min.x - ray.origin.x) / ray.direction.x;
-	float tmax = (max.x - ray.origin.x) / ray.direction.x;
+	auto rayOrigin = ray.origin;
+	
+	float tmin = (min.x - rayOrigin.x) / rayDirection.x;
+	float tmax = (max.x - rayOrigin.x) / rayDirection.x;
 
 	if (tmin > tmax) swap(tmin, tmax);
 
-	float tymin = (min.y - ray.origin.y) / ray.direction.y;
-	float tymax = (max.y - ray.origin.y) / ray.direction.y;
+	float tymin = (min.y - rayOrigin.y) / rayDirection.y;
+	float tymax = (max.y - rayOrigin.y) / rayDirection.y;
 
 	if (tymin > tymax) swap(tymin, tymax);
 
 	if ((tmin > tymax) || (tymin > tmax))
-		return false;
+		return -1;
 
 	if (tymin > tmin)
 		tmin = tymin;
@@ -50,13 +55,13 @@ bool BoundingBox::isIntersect(Ray ray, float* t)
 	if (tymax < tmax)
 		tmax = tymax;
 
-	float tzmin = (min.z - ray.origin.z) / ray.direction.z;
-	float tzmax = (max.z - ray.origin.z) / ray.direction.z;
+	float tzmin = (min.z - rayOrigin.z) / rayDirection.z;
+	float tzmax = (max.z - rayOrigin.z) / rayDirection.z;
 
 	if (tzmin > tzmax) swap(tzmin, tzmax);
 
 	if ((tmin > tzmax) || (tzmin > tmax))
-		return false;
+		return -1;
 
 	if (tzmin > tmin)
 		tmin = tzmin;
@@ -64,8 +69,8 @@ bool BoundingBox::isIntersect(Ray ray, float* t)
 	if (tzmax < tmax)
 		tmax = tzmax;
 
-	*t = tmin;
-	return true;
+	
+	return tmin;
 }
 
 void BoundingBox::printBounds()

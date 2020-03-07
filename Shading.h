@@ -9,8 +9,10 @@
 #include "Light.h"
 #include "Reflection.h"
 #include  "Refraction.h"
+#include "RayIntersection.h"
 class Reflection;
 class Refraction;
+class RayIntersection;
 class Shading
 {
 
@@ -25,6 +27,7 @@ private:
 	vector<Shape*> objects;
 public:
 	Reflection* reflection;
+	RayIntersection* rayIntersection;
 	Refraction* refraction;
 	Shading( float shadow_ray_eps, const vector<Material*>& materials, Color* ambient_light_list,
 		int light_count, int object_count, const vector<PointLight*>& point_lights, const vector<Shape*>& objects)

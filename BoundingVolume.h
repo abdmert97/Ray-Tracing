@@ -25,7 +25,7 @@ public:
 
 	}
 
-	bool isInRight(const Vector3f& midPoint, BoundingBox* bounding_box);
+	bool isInLeft(const Vector3f& midPoint, BoundingBox* bounding_box);
 	bool sortVector(const Vector3f& v1, const Vector3f& v2);
 
 
