@@ -20,8 +20,9 @@ public:
 		root = new Node();
 		root->nodeType = Root;
 	    objects = std::move(_objects);
-
-		build(root, 0, objects.size()-1);
+		for (int i = 0; i < objects.size();i++)
+			root->ObjectIDs.push_back(i);
+		build(root);
 
 	}
 
@@ -29,7 +30,7 @@ public:
 	bool sortVector(const Vector3f& v1, const Vector3f& v2);
 
 
-	void build(Node* node, int left, int right);
+	void build(Node* node);
 };
 
 

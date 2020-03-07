@@ -2,62 +2,42 @@
 #include <ctime>
 
 
-void BoundingVolume::build(Node* node, int left, int right)
+void BoundingVolume::build(Node* node)
 {
-
-	Shape* shapeLeft = objects[left];
-	Shape* shapeRight = objects[right];
-	node->start = left;
-	node->end = right;
-	cout << left << " " << right << endl;
-	
-	for(int i = left; i<= right;i++)
+	int size = node->ObjectIDs.size();
+/*	for (int i : node->ObjectIDs)
+		cout << i;
+	cout << endl;*/
+	vector<Vector3f> midpoints;
+	for(int i = 0; i< size;i++)
 	{
-		Shape* shape = objects[i];
-		BoundingBox* shapeBound = shape->getBounds();
-		node->boundingBox->extend(shapeBound);
+		Shape* shape = objects[node->ObjectIDs[i]];
+		BoundingBox *bounds = shape->getBounds();
+		node->boundingBox->extend(bounds);
+		midpoints.push_back(bounds->midPoint());
+		
 	}
+	if (size <= 2) return;
 	
-	if (left + 1 >= right) return;
-	vector<Vector3f*> midpoints ;
-	for (int i = left; i <= right; i++)
-	{
-		Shape* shape = objects[i];
-		BoundingBox* shapeBound = shape->getBounds();
 	
-		midpoints.push_back(&shapeBound->midPoint());
-	}
 	std::sort(midpoints.begin(), midpoints.end());
-
-
-	Vector3f midPoint =*midpoints[midpoints.size()/2];
+	Vector3f midPoint = midpoints[midpoints.size() / 2];
 	
-	
-	int leftPoint = left;
-	for (int i = left; i <= right; i++)
+	node->left = new Node;
+	node->right = new Node;
+	for (int i = 0; i < size; i++)
 	{
-		Shape* shape = objects[i];
+		Shape* shape = objects[node->ObjectIDs[i]];
 		BoundingBox* shapeBound = shape->getBounds();
-		if(isInLeft(midPoint,shapeBound))
+		if (i<=size/2)
 		{
-			std::swap(objects[i], objects[leftPoint++]);
+			node->left->ObjectIDs.push_back(node->ObjectIDs[i]);
 		}
+		else
+			node->right->ObjectIDs.push_back(node->ObjectIDs[i]);
 	}
-	if (leftPoint == left || leftPoint >= right) {
-		leftPoint = (left + right) / 2;
-	}
-
-	if (left < leftPoint) {
-		node->left = new Node();
-		level++;
-		build(node->left, left, leftPoint);
-	}
-	if (leftPoint < right) {
-		level++;
-		node->right = new Node();
-		build(node->right, leftPoint+1, right);
-	}
-	
+	build(node->left);
+	build(node->right);
 }
 bool BoundingVolume::isInLeft(const Vector3f& midPoint, BoundingBox* bounding_box)
 {

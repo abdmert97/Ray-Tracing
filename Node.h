@@ -18,11 +18,11 @@ public:
 	Node* left;
 	Node* right;
 	NodeType nodeType;
-	int start;
-	int end;
+	vector<int> ObjectIDs;
 	Node()
 	{
 		boundingBox = new BoundingBox();
+		nodeType = Leaf;
 		left = nullptr;
 		right = nullptr;
 	}

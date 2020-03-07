@@ -5,7 +5,7 @@
 
 void RayIntersection::BoundingBoxIntersection(Ray ray,Node *node,IntersectionInfo* retVal)
 {
-
+	
 	float t_min = retVal->t;
 	
 	float t_intersection = node->boundingBox->isIntersect(ray);
@@ -25,9 +25,9 @@ void RayIntersection::BoundingBoxIntersection(Ray ray,Node *node,IntersectionInf
 		if(node->left == nullptr || node->right == nullptr)
 		{
 		
-			for (int i = node->start; i <= node->end; i++)
+			for (int i = 0; i < node->ObjectIDs.size(); i++)
 			{
-				Shape* shape = objects[i];
+				Shape* shape = objects[node->ObjectIDs[i]];
 				IntersectionInfo intesectionInfo = shape->intersect(ray);
 				if (intesectionInfo.isIntersect == true)
 				{
@@ -35,7 +35,7 @@ void RayIntersection::BoundingBoxIntersection(Ray ray,Node *node,IntersectionInf
 					if (intesectionInfo.t <= t_min)
 					{
 						t_min = intesectionInfo.t;
-						intesectionInfo.objectID = i;
+						intesectionInfo.objectID = node->ObjectIDs[i];
 						*retVal = intesectionInfo;
 					}
 					
