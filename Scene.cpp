@@ -243,13 +243,13 @@ void Scene::readXML(const char* xmlPath)
 			Vector3f left = up.normalizeVector() * forward;
 			Vector3f newUp = (forward * left).normalizeVector();
 			
-			float height = imgPlane.distance / tan(fovY * 0.0174532925 * 0.5f);
+			float height = imgPlane.distance * tan(fovY * 0.0174532925 * 0.5f);
 			float r = (float)imgPlane.nx / imgPlane.ny;
 		
-			imgPlane.left = -0.5*r*height;
-			imgPlane.right = 0.5*r*height;
-			imgPlane.bottom = -0.5* height;
-			imgPlane.top = 0.5* height;
+			imgPlane.left =  -1 * r*height;
+			imgPlane.right = 1* r*height;
+			imgPlane.bottom = -1* height;
+			imgPlane.top =  1 * height;
 			cameras.push_back(new Camera(id, imageName, pos, forward*-1, newUp, imgPlane));
 		}
 		else
