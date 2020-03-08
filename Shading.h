@@ -24,13 +24,13 @@ private:
 	int lightCount;
 	int objectCount;
 	vector<PointLight*> lights;
-	vector<Shape*> objects;
+	vector<Shape*> *objects;
 public:
 	Reflection* reflection;
 	RayIntersection* rayIntersection;
 	Refraction* refraction;
 	Shading( float shadow_ray_eps, const vector<Material*>& materials, Color* ambient_light_list,
-		int light_count, int object_count, const vector<PointLight*>& point_lights, const vector<Shape*>& objects)
+		int light_count, int object_count, const vector<PointLight*>& point_lights,vector<Shape*>* objects)
 		: 
 		  shadowRayEps(shadow_ray_eps),
 		  materials(materials),

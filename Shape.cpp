@@ -192,12 +192,11 @@ Mesh::Mesh(int id, int matIndex, Material* material, const vector<Triangle>& fac
 
 void Mesh::MeshVolumeIntersection(const Ray& ray, Node* node, IntersectionInfo* intersecion_info) const
 {
-	float t_min = intersecion_info->t;
-	short t_intersection = node->boundingBox->isIntersect(ray);
-
-	if (node->boundingBox->isIntersect(ray) != -1)
+	float t = node->boundingBox.isIntersect(ray);
+	float t_int = node->boundingBox.isIntersect(ray);
+	if (t_int != -1 && t>= t_int)
 	{
-		if (node->left != nullptr)
+		if (node->left != nullptr )
 		{
 			MeshVolumeIntersection(ray, node->left, intersecion_info);
 		}
@@ -206,12 +205,13 @@ void Mesh::MeshVolumeIntersection(const Ray& ray, Node* node, IntersectionInfo* 
 			MeshVolumeIntersection(ray, node->right, intersecion_info);
 		}
 
-		if (node->left == nullptr || node->right == nullptr)
+		if (node->left == nullptr && node->right == nullptr)
 		{
 			const Triangle* shape = &faces[node->ObjectIDs[0]];
 
 			if (shape->bounds->isIntersect(ray) != -1)
 			{
+				float t_min = intersecion_info->t;
 				IntersectionInfo intesectionInfo = shape->intersect(ray);
 				if (intesectionInfo.isIntersect == true)
 				{
@@ -237,8 +237,7 @@ IntersectionInfo Mesh::intersect(const Ray & ray) const
 
 	IntersectionInfo returnValue{};
 
-	float t = 9999;
-	returnValue.t = t;
+	returnValue.t = INT16_MAX;
 	Node* node = boundingVolume->root;
 	
 	MeshVolumeIntersection(ray, node, &returnValue);

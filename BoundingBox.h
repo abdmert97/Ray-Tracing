@@ -34,7 +34,7 @@ public:
 	void extend(Shape * shape);
 	static Vector3f getMin(Vector3f v1, Vector3f v2);
 	static Vector3f getMax(Vector3f v1, Vector3f v2);
-	short isIntersect(Ray ray);
+	float isIntersect(Ray ray);
 	void printBounds();
 	Vector3f midPoint();
 };

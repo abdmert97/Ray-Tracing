@@ -16,7 +16,7 @@ class RayIntersection;
 class Refraction
 {
 public:
-	Refraction(Reflection* const reflection, Shading* const shading, const vector<Shape*>& objects,
+	Refraction(Reflection* const reflection, Shading* const shading,vector<Shape*>* objects,
 		RayIntersection* const ray_ýntersection)
 		: reflection(reflection),
 		  shading(shading),
@@ -27,7 +27,7 @@ public:
 
 	Reflection* reflection;
 	Shading* shading;
-	vector<Shape*> objects;
+	vector<Shape*> *objects;
 	RayIntersection *rayIntersection;
 	
 	Color dialecticRefraction(Ray ray,Material material);

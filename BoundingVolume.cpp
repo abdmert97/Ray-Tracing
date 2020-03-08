@@ -9,15 +9,15 @@ void BoundingVolume::build(Node* node)
 
 	for(int i = 0; i< size;i++)
 	{
-		Shape* shape = objects[node->ObjectIDs[i]];
+		Shape* shape = (*objects)[node->ObjectIDs[i]];
 		BoundingBox *bounds = shape->getBounds();
-		node->boundingBox->extend(bounds);
+		node->boundingBox.extend(bounds);
 	}
 	if (size <= 1) return;
 	vector<std::pair<Vector3f, int>> midpoints;
 	for (int i = 0; i < size; i++)
 	{
-		Shape* shape = objects[node->ObjectIDs[i]];
+		Shape* shape = (*objects)[node->ObjectIDs[i]];
 		BoundingBox* bounds = shape->getBounds();
 		midpoints.emplace_back(bounds->midPoint(), node->ObjectIDs[i]);
 	}
@@ -46,7 +46,7 @@ void BoundingVolume::buildMeshVolume(Node* node)
 	{
 		Triangle shape = (*triangles)[node->ObjectIDs[i]];
 		BoundingBox* bounds = shape.getBounds();
-		node->boundingBox->extend(bounds);
+		node->boundingBox.extend(bounds);
 	}
 	if (size <= 1) return;
 	vector<std::pair<Vector3f,int>> midpoints;

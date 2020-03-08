@@ -14,14 +14,14 @@ class Node
 {
 	
 public:
-	BoundingBox* boundingBox;
+	BoundingBox boundingBox;
 	Node* left;
 	Node* right;
 	NodeType nodeType;
 	vector<int> ObjectIDs;
 	Node()
 	{
-		boundingBox = new BoundingBox();
+		boundingBox = BoundingBox{};
 		nodeType = Leaf;
 		left = nullptr;
 		right = nullptr;

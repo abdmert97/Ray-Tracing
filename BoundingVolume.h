@@ -11,17 +11,17 @@
 class BoundingVolume
 {
 private:
-	vector<Shape*> objects;
+	vector<Shape*> *objects;
 	vector<Triangle> *triangles;
 public:
 	Node* root;
 	int level=0;
-	BoundingVolume(vector<Shape*> _objects)
+	BoundingVolume(vector<Shape*> *_objects)
 	{
 		root = new Node();
 		root->nodeType = Root;
 	    objects = std::move(_objects);
-		for (int i = 0; i < objects.size();i++)
+		for (int i = 0; i < objects->size();i++)
 			root->ObjectIDs.push_back(i);
 		build(root);
 

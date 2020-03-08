@@ -10,14 +10,15 @@ void RayIntersection::BoundingBoxIntersection(Ray ray,Node *node,IntersectionInf
 	
 
 
-	if(node->boundingBox->isIntersect(ray) != -1)
+	float t = node->boundingBox.isIntersect(ray);
+	float t_int = node->boundingBox.isIntersect(ray);
+	if (t_int != -1 && t >= t_int)
 	{
-		
-		if(node->left != nullptr)
+		if (node->left != nullptr)
 		{
-			BoundingBoxIntersection(ray, node->left,retVal);
+			BoundingBoxIntersection(ray, node->left, retVal);
 		}
-		if(node->right != nullptr)
+		if (node->right != nullptr)
 		{
 			BoundingBoxIntersection(ray, node->right, retVal);
 		}
@@ -44,10 +45,7 @@ void RayIntersection::BoundingBoxIntersection(Ray ray,Node *node,IntersectionInf
 
 IntersectionInfo RayIntersection::closestObject(Ray ray)
 {
-	
-
 	IntersectionInfo returnValue{};
-	
 
 	returnValue.t = 9999;
 	Node* node = boundingVolume->root;

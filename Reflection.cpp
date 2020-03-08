@@ -16,7 +16,7 @@ void Reflection::getReflection(int depth, IntersectionInfo& intersectionInfo, Ma
 
 		if (reflectionInfo.isIntersect)
 		{
-			Shape* reflectionShape = objects[reflectionInfo.objectID];
+			Shape* reflectionShape = (*objects)[reflectionInfo.objectID];
 		
 			Color reflectanceColor = { 0,0,0 };
 

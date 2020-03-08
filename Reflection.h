@@ -15,7 +15,7 @@ class Reflection
 {
 	
 	float shadowRayEps;
-	vector<Shape*> objects;
+	vector<Shape*> *objects;
 	
 public:
 	Vector3f backgroundColor;
@@ -23,7 +23,7 @@ public:
 	RayIntersection* rayIntersection;
 
 	Reflection( const float shadow_ray_eps,
-		const vector<Shape*>& objects, const Vector3f& background_color)
+		 vector<Shape*>* objects, const Vector3f& background_color)
 		:
 		  shadowRayEps(shadow_ray_eps),
 		  objects(objects),

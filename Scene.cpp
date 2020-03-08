@@ -440,7 +440,7 @@ void Scene::readXML(const char* xmlPath)
 			cout << type << endl;
 			
 			happly::PLYData plyIn("hw2/ply/dragon_remeshed.ply");
-
+			int currID = vertices.size();
 			std::vector<std::array<double, 3>> vPos = plyIn.getVertexPositions();
 			std::vector<std::vector<int>> fInd = plyIn.getFaceIndices<int>();
 			Material* material = materials[matIndex - 1];
@@ -451,9 +451,9 @@ void Scene::readXML(const char* xmlPath)
 			}
 			for (std::vector<int> vertex : fInd)
 			{
-				p1Index = vertex[0];
-				p2Index = vertex[1];
-				p3Index = vertex[2];
+				p1Index = vertex[0]+currID;
+				p2Index = vertex[1]+currID;
+				p3Index = vertex[2]+currID;
 
 				faces.push_back(*(new Triangle(id, matIndex - 1, material, p1Index, p2Index, p3Index, &vertices, TriangleShape)));
 				meshIndices->push_back(p1Index);
@@ -555,13 +555,13 @@ void Scene::initObjects()
 {
 	setScene();
 	rayIntersection = new RayIntersection(objects, objectCount);
-	reflection = new Reflection(shadowRayEps,objects,backgroundColor);
-	shading = new Shading(shadowRayEps,materials,ambientLightList,lightCount,objectCount,lights,objects);
+	reflection = new Reflection(shadowRayEps,&objects,backgroundColor);
+	shading = new Shading(shadowRayEps,materials,ambientLightList,lightCount,objectCount,lights,&objects);
 	shading->reflection = reflection;
 	reflection->shading = shading;
 	reflection->rayIntersection = rayIntersection;
-	refraction = new Refraction(reflection, shading, objects, rayIntersection);
-	boundingVolume = new BoundingVolume(objects);
+	refraction = new Refraction(reflection, shading, &objects, rayIntersection);
+	boundingVolume = new BoundingVolume(&objects);
 	shading->refraction = refraction;
 	shading->rayIntersection = rayIntersection;
 

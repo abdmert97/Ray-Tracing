@@ -30,7 +30,7 @@ Vector3f BoundingBox::getMax(Vector3f v1, Vector3f v2)
 	};
 }
 
-short BoundingBox::isIntersect(Ray ray)
+float BoundingBox::isIntersect(Ray ray)
 {
 	
 	auto rayDirection = ray.direction;
@@ -71,7 +71,7 @@ short BoundingBox::isIntersect(Ray ray)
 		tmax = tzmax;
 
 	
-	return 1;
+	return tmin;
 }
 
 void BoundingBox::printBounds()
