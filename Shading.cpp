@@ -31,8 +31,8 @@ Color Shading::shading(int depth, Shape*& shape, IntersectionInfo& closestObject
 			light = lights[l];
 			lightVector = (light->position - closestObjectInfo.intersectionPoint);
 			// Shadows
-			Vector3f lightPosition = light->position;
-			if (isShadow(lightPosition, closestObjectInfo.intersectionPoint))
+			
+			if (isShadow(light->position, closestObjectInfo.intersectionPoint))
 			{
 				continue;
 			}

@@ -238,16 +238,19 @@ void Scene::readXML(const char* xmlPath)
 			str = camElement->GetText();
 			strcpy(imageName, str);
 
-			float aspectRatio = tan(1 * 0.5f) / tan(fovY * 0.0174532925 * 0.5f);
-			imgPlane.left = -1;
-			imgPlane.right = 1 ;
-			imgPlane.bottom = -1;
-			imgPlane.top = 1;
+			
 			Vector3f forward = (pos - gazePoint).normalizeVector();
 			Vector3f left = up.normalizeVector() * forward;
 			Vector3f newUp = (forward * left).normalizeVector();
+			
+			float height = imgPlane.distance / tan(fovY * 0.0174532925 * 0.5f);
+			float r = (float)imgPlane.nx / imgPlane.ny;
 		
-			cameras.push_back(new Camera(id, imageName, pos, forward*-1, up, imgPlane));
+			imgPlane.left = -0.5*r*height;
+			imgPlane.right = 0.5*r*height;
+			imgPlane.bottom = -0.5* height;
+			imgPlane.top = 0.5* height;
+			cameras.push_back(new Camera(id, imageName, pos, forward*-1, newUp, imgPlane));
 		}
 		else
 		{
