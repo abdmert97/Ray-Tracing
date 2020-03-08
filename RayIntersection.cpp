@@ -24,27 +24,22 @@ void RayIntersection::BoundingBoxIntersection(Ray ray,Node *node,IntersectionInf
 	
 		if(node->left == nullptr || node->right == nullptr)
 		{
-		
-			for (int i = 0; i < node->ObjectIDs.size(); i++)
+			const Shape* shape = objects[node->ObjectIDs[0]];
+			if (shape->bounds->isIntersect(ray) != -1)
 			{
-				const Shape* shape = objects[node->ObjectIDs[i]];
-				if (shape->bounds->isIntersect(ray) == -1) continue;;
 				IntersectionInfo intesectionInfo = shape->intersect(ray);
 				if (intesectionInfo.isIntersect == true)
 				{
 					if (intesectionInfo.t <= t_min)
 					{
 						t_min = intesectionInfo.t;
-						intesectionInfo.objectID = node->ObjectIDs[i];
+						intesectionInfo.objectID = node->ObjectIDs[0];
 						*retVal = intesectionInfo;
 					}
 				}
 			}
 		}
 	}
-	
-	
-	
 }
 
 IntersectionInfo RayIntersection::closestObject(Ray ray)

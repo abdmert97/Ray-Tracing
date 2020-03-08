@@ -208,19 +208,17 @@ void Mesh::MeshVolumeIntersection(const Ray& ray, Node* node, IntersectionInfo* 
 
 		if (node->left == nullptr || node->right == nullptr)
 		{
+			const Triangle* shape = &faces[node->ObjectIDs[0]];
 
-			for (int i = 0; i < node->ObjectIDs.size(); i++)
+			if (shape->bounds->isIntersect(ray) != -1)
 			{
-				const Triangle *shape = &faces[node->ObjectIDs[i]];
-				
-				if (shape->bounds->isIntersect(ray) == -1) continue;;
 				IntersectionInfo intesectionInfo = shape->intersect(ray);
 				if (intesectionInfo.isIntersect == true)
 				{
 					if (intesectionInfo.t <= t_min)
 					{
 						t_min = intesectionInfo.t;
-						intesectionInfo.objectID = node->ObjectIDs[i];
+						intesectionInfo.objectID = node->ObjectIDs[0];
 						*intersecion_info = intesectionInfo;
 					}
 

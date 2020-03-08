@@ -210,33 +210,71 @@ void Scene::readXML(const char* xmlPath)
 		if (type != nullptr && type[0] == 'l')
 		{
 
-			;
+			camElement = pCamera->FirstChildElement("Position");
+			str = camElement->GetText();
+			sscanf(str, "%f %f %f", &pos.x, &pos.y, &pos.z);
 
+			camElement = pCamera->FirstChildElement("GazePoint");
+			str = camElement->GetText();
+			Vector3f gazePoint;
+			sscanf(str, "%f %f %f", &gazePoint.x, &gazePoint.y, &gazePoint.z);
 
-			
+			camElement = pCamera->FirstChildElement("Up");
+			str = camElement->GetText();
+			sscanf(str, "%f %f %f", &up.x, &up.y, &up.z);
+
+			camElement = pCamera->FirstChildElement("FovY");
+			float fovY;
+			eResult = camElement->QueryFloatText(&fovY);
+
+			camElement = pCamera->FirstChildElement("NearDistance");
+			eResult = camElement->QueryFloatText(&imgPlane.distance);
+
+			camElement = pCamera->FirstChildElement("ImageResolution");
+			str = camElement->GetText();
+			sscanf(str, "%d %d", &imgPlane.nx, &imgPlane.ny);
+
+			camElement = pCamera->FirstChildElement("ImageName");
+			str = camElement->GetText();
+			strcpy(imageName, str);
+
+			float aspectRatio = tan(1 * 0.5f) / tan(fovY * 0.0174532925 * 0.5f);
+			imgPlane.left = -1;
+			imgPlane.right = 1 ;
+			imgPlane.bottom = -1;
+			imgPlane.top = 1;
+			Vector3f forward = (pos - gazePoint).normalizeVector();
+			Vector3f left = up.normalizeVector() * forward;
+			Vector3f newUp = (forward * left).normalizeVector();
+		
+			cameras.push_back(new Camera(id, imageName, pos, forward*-1, up, imgPlane));
 		}
-		camElement = pCamera->FirstChildElement("Position");
-		str = camElement->GetText();
-		sscanf(str, "%f %f %f", &pos.x, &pos.y, &pos.z);
-		camElement = pCamera->FirstChildElement("Gaze");
-		str = camElement->GetText();
-		sscanf(str, "%f %f %f", &gaze.x, &gaze.y, &gaze.z);
-		camElement = pCamera->FirstChildElement("Up");
-		str = camElement->GetText();
-		sscanf(str, "%f %f %f", &up.x, &up.y, &up.z);
-		camElement = pCamera->FirstChildElement("NearPlane");
-		str = camElement->GetText();
-		sscanf(str, "%f %f %f %f", &imgPlane.left, &imgPlane.right, &imgPlane.bottom, &imgPlane.top);
-		camElement = pCamera->FirstChildElement("NearDistance");
-		eResult = camElement->QueryFloatText(&imgPlane.distance);
-		camElement = pCamera->FirstChildElement("ImageResolution");
-		str = camElement->GetText();
-		sscanf(str, "%d %d", &imgPlane.nx, &imgPlane.ny);
-		camElement = pCamera->FirstChildElement("ImageName");
-		str = camElement->GetText();
-		strcpy(imageName, str);
+		else
+		{
+			camElement = pCamera->FirstChildElement("Position");
+			str = camElement->GetText();
+			sscanf(str, "%f %f %f", &pos.x, &pos.y, &pos.z);
+			camElement = pCamera->FirstChildElement("Gaze");
+			str = camElement->GetText();
+			sscanf(str, "%f %f %f", &gaze.x, &gaze.y, &gaze.z);
+			camElement = pCamera->FirstChildElement("Up");
+			str = camElement->GetText();
+			sscanf(str, "%f %f %f", &up.x, &up.y, &up.z);
+			camElement = pCamera->FirstChildElement("NearPlane");
+			str = camElement->GetText();
+			sscanf(str, "%f %f %f %f", &imgPlane.left, &imgPlane.right, &imgPlane.bottom, &imgPlane.top);
+			camElement = pCamera->FirstChildElement("NearDistance");
+			eResult = camElement->QueryFloatText(&imgPlane.distance);
+			camElement = pCamera->FirstChildElement("ImageResolution");
+			str = camElement->GetText();
+			sscanf(str, "%d %d", &imgPlane.nx, &imgPlane.ny);
+			camElement = pCamera->FirstChildElement("ImageName");
+			str = camElement->GetText();
+			strcpy(imageName, str);
 
-		cameras.push_back(new Camera(id, imageName, pos, gaze, up, imgPlane));
+			cameras.push_back(new Camera(id, imageName, pos, gaze, up, imgPlane));
+		}
+
 
 		pCamera = pCamera->NextSiblingElement("Camera");
 	}
@@ -404,15 +442,19 @@ void Scene::readXML(const char* xmlPath)
 			happly::PLYData plyIn("hw2/ply/dragon_remeshed.ply");
 
 			std::vector<std::array<double, 3>> vPos = plyIn.getVertexPositions();
-			std::vector<std::vector<size_t>> fInd = plyIn.getFaceIndices<size_t>();
+			std::vector<std::vector<int>> fInd = plyIn.getFaceIndices<int>();
 			Material* material = materials[matIndex - 1];
 			for (std::array<double, 3> vertex : vPos)
 			{
 				vertices.push_back(Vector3f{ (float)vertex[0], (float)vertex[1], (float)vertex[2] });
 				
 			}
-			for (std::vector<size_t> vertex : fInd)
+			for (std::vector<int> vertex : fInd)
 			{
+				p1Index = vertex[0];
+				p2Index = vertex[1];
+				p3Index = vertex[2];
+
 				faces.push_back(*(new Triangle(id, matIndex - 1, material, p1Index, p2Index, p3Index, &vertices, TriangleShape)));
 				meshIndices->push_back(p1Index);
 				meshIndices->push_back(p2Index);
@@ -491,6 +533,8 @@ Scene::Scene(const char* xmlPath)
 	readXML(xmlPath);
 	cout << "xml readed" << endl;
 	initObjects();
+	for (Shape* obj : objects)
+		obj->getBounds();
 }
 void Scene::setScene()
 {
