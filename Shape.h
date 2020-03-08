@@ -40,6 +40,7 @@ private:
 class Sphere: public Shape
 {
 public:
+	
 	Sphere(void);	// Constructor
 	Sphere(int id, int matIndex, Material* material, int cIndex, float R, vector<Vector3f> *vertices,ShapeType type);	// Constructor
 	IntersectionInfo intersect(const Ray & ray) const;	// Will take a ray and return a structure related to the intersection information. You will implement this.
