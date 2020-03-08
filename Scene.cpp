@@ -371,55 +371,12 @@ void Scene::readXML(const char* xmlPath)
 	// Parse objects
 	pElement = pRoot->FirstChildElement("Objects");
 	int idCount = 0;
-	// Parse spheres
-	XMLElement* pObject = pElement->FirstChildElement("Sphere");
 	XMLElement* objElement;
-	while (pObject != nullptr)
-	{
-		int id;
-		int matIndex;
-		int cIndex;
-		float R;
-
-
-		
-		eResult = pObject->QueryIntAttribute("id", &id);
-		objElement = pObject->FirstChildElement("Material");
-		eResult = objElement->QueryIntText(&matIndex);
-		objElement = pObject->FirstChildElement("Center");
-		eResult = objElement->QueryIntText(&cIndex);
-		objElement = pObject->FirstChildElement("Radius");
-		eResult = objElement->QueryFloatText(&R);
-		Material* material = materials[matIndex - 1];
-		objects.push_back(new Sphere(idCount++, matIndex-1,material, cIndex, R, &vertices,SphereType));
-
-		pObject = pObject->NextSiblingElement("Sphere");
-	}
-
-	// Parse triangles
-	pObject = pElement->FirstChildElement("Triangle");
-	while (pObject != nullptr)
-	{
-		int id;
-		int matIndex;
-		int p1Index;
-		int p2Index;
-		int p3Index;
-
-		eResult = pObject->QueryIntAttribute("id", &id);
-		objElement = pObject->FirstChildElement("Material");
-		eResult = objElement->QueryIntText(&matIndex);
-		objElement = pObject->FirstChildElement("Indices");
-		str = objElement->GetText();
-		sscanf(str, "%d %d %d", &p1Index, &p2Index, &p3Index);
-		Material* material = materials[matIndex-1];
-		objects.push_back(new Triangle(idCount++, matIndex-1,material, p1Index, p2Index, p3Index, &vertices,TriangleShape));
-
-		pObject = pObject->NextSiblingElement("Triangle");
-	}
+	// Parse spheres
+	
 	//readPly("hw2/ply/dragon_remeshed.ply");
 	// Parse meshes
-	pObject = pElement->FirstChildElement("Mesh");
+	XMLElement* pObject = pElement->FirstChildElement("Mesh");
 	while (pObject != nullptr)
 	{
 		int id;
@@ -501,6 +458,51 @@ void Scene::readXML(const char* xmlPath)
 			
 		}
 		pObject = pObject->NextSiblingElement("Mesh");
+	}
+ pObject = pElement->FirstChildElement("Sphere");
+
+	while (pObject != nullptr)
+	{
+		int id;
+		int matIndex;
+		int cIndex;
+		float R;
+
+
+
+		eResult = pObject->QueryIntAttribute("id", &id);
+		objElement = pObject->FirstChildElement("Material");
+		eResult = objElement->QueryIntText(&matIndex);
+		objElement = pObject->FirstChildElement("Center");
+		eResult = objElement->QueryIntText(&cIndex);
+		objElement = pObject->FirstChildElement("Radius");
+		eResult = objElement->QueryFloatText(&R);
+		Material* material = materials[matIndex - 1];
+		objects.push_back(new Sphere(idCount++, matIndex - 1, material, cIndex, R, &vertices, SphereType));
+
+		pObject = pObject->NextSiblingElement("Sphere");
+	}
+
+	// Parse triangles
+	pObject = pElement->FirstChildElement("Triangle");
+	while (pObject != nullptr)
+	{
+		int id;
+		int matIndex;
+		int p1Index;
+		int p2Index;
+		int p3Index;
+
+		eResult = pObject->QueryIntAttribute("id", &id);
+		objElement = pObject->FirstChildElement("Material");
+		eResult = objElement->QueryIntText(&matIndex);
+		objElement = pObject->FirstChildElement("Indices");
+		str = objElement->GetText();
+		sscanf(str, "%d %d %d", &p1Index, &p2Index, &p3Index);
+		Material* material = materials[matIndex - 1];
+		objects.push_back(new Triangle(idCount++, matIndex - 1, material, p1Index, p2Index, p3Index, &vertices, TriangleShape));
+
+		pObject = pObject->NextSiblingElement("Triangle");
 	}
 
 	// Parse lights
