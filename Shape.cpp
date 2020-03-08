@@ -193,9 +193,9 @@ Mesh::Mesh(int id, int matIndex, Material* material, const vector<Triangle>& fac
 void Mesh::MeshVolumeIntersection(const Ray& ray, Node* node, IntersectionInfo* intersecion_info) const
 {
 	float t_min = intersecion_info->t;
-	float t_intersection = node->boundingBox->isIntersect(ray);
+	short t_intersection = node->boundingBox->isIntersect(ray);
 
-	if (t_intersection != -1)
+	if (node->boundingBox->isIntersect(ray) != -1)
 	{
 		if (node->left != nullptr)
 		{
@@ -234,8 +234,6 @@ Note that IntersectionInfo structure should hold the information related to the 
 You should to declare the variables in IntersectionInfo structure you think you will need. It is in defs.h file. */
 IntersectionInfo Mesh::intersect(const Ray & ray) const
 {
-    int size = faces.size();
-
 
 	IntersectionInfo returnValue{};
 

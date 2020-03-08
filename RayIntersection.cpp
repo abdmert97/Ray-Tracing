@@ -8,9 +8,9 @@ void RayIntersection::BoundingBoxIntersection(Ray ray,Node *node,IntersectionInf
 	
 	float t_min = retVal->t;
 	
-	float t_intersection = node->boundingBox->isIntersect(ray);
 
-	if(t_intersection != -1)
+
+	if(node->boundingBox->isIntersect(ray) != -1)
 	{
 		
 		if(node->left != nullptr)
@@ -48,8 +48,8 @@ IntersectionInfo RayIntersection::closestObject(Ray ray)
 
 	IntersectionInfo returnValue{};
 	
-	float t = 9999;
-	returnValue.t = t;
+
+	returnValue.t = 9999;
 	Node* node = boundingVolume->root;
 
 	BoundingBoxIntersection(ray,node,&returnValue);
