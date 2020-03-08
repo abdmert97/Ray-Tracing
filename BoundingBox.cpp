@@ -33,17 +33,13 @@ Vector3f BoundingBox::getMax(Vector3f v1, Vector3f v2)
 float BoundingBox::isIntersect(Ray ray)
 {
 	
-	auto rayDirection = ray.direction;
-
-	auto rayOrigin = ray.origin;
-	
-	float tmin = (min.x - rayOrigin.x) / rayDirection.x;
-	float tmax = (max.x - rayOrigin.x) / rayDirection.x;
+	float tmin = (min.x - ray.origin.x) / ray.direction.x;
+	float tmax = (max.x - ray.origin.x) / ray.direction.x;
 
 	if (tmin > tmax) swap(tmin, tmax);
 
-	float tymin = (min.y - rayOrigin.y) / rayDirection.y;
-	float tymax = (max.y - rayOrigin.y) / rayDirection.y;
+	float tymin = (min.y - ray.origin.y) / ray.direction.y;
+	float tymax = (max.y - ray.origin.y) / ray.direction.y;
 
 	if (tymin > tymax) swap(tymin, tymax);
 
@@ -56,8 +52,8 @@ float BoundingBox::isIntersect(Ray ray)
 	if (tymax < tmax)
 		tmax = tymax;
 
-	float tzmin = (min.z - rayOrigin.z) / rayDirection.z;
-	float tzmax = (max.z - rayOrigin.z) / rayDirection.z;
+	float tzmin = (min.z - ray.origin.z) / ray.direction.z;
+	float tzmax = (max.z - ray.origin.z) / ray.direction.z;
 
 	if (tzmin > tzmax) swap(tzmin, tzmax);
 

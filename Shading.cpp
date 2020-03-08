@@ -59,10 +59,10 @@ bool Shading::isShadow(Vector3f& lightPosition, Vector3f& intersectionPoint)cons
 {
 	Vector3f lightVector = lightPosition - intersectionPoint;
 	
-	Ray* shadowRay = new Ray((intersectionPoint + lightVector.normalizeVector() * shadowRayEps), lightVector.normalizeVector());
-	Ray* shadowRay_ = new Ray(intersectionPoint, lightVector.normalizeVector());
-	float tFromIntersectionToLight = shadowRay_->gett(lightPosition);
-	IntersectionInfo returnVal = rayIntersection->closestObject(*shadowRay);
+	Ray shadowRay = Ray((intersectionPoint + lightVector.normalizeVector() * shadowRayEps), lightVector.normalizeVector());
+	Ray shadowRay_ = Ray(intersectionPoint, lightVector.normalizeVector());
+	float tFromIntersectionToLight = shadowRay_.gett(lightPosition);
+	IntersectionInfo returnVal = rayIntersection->closestObject(shadowRay);
 	Shape* shadowShape;
 	if (returnVal.t < tFromIntersectionToLight)
 	{
@@ -80,6 +80,7 @@ bool Shading::isShadow(Vector3f& lightPosition, Vector3f& intersectionPoint)cons
 			}
 		}
 	}*/
+
 	return false;
 }
 void Shading::calculateColor(IntersectionInfo& closestObjectInfo, Material material, PointLight* light, Vector3f lightVector, Vector3f cameraVectorNormalized, Vector3f& shaders) const

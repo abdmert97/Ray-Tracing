@@ -10,9 +10,9 @@ void Reflection::getReflection(int depth, IntersectionInfo& intersectionInfo, Ma
 	{
 		
 		Vector3f reflectionDirection = reflect(cameraVectorNormalized * -1, intersectionInfo.hitNormal).normalizeVector();
-		Ray* reflectionRay = new Ray(intersectionInfo.intersectionPoint + reflectionDirection * shadowRayEps, reflectionDirection);
+		Ray reflectionRay =Ray(intersectionInfo.intersectionPoint + reflectionDirection * shadowRayEps, reflectionDirection);
 
-		IntersectionInfo reflectionInfo = rayIntersection->closestObject(*reflectionRay);
+		IntersectionInfo reflectionInfo = rayIntersection->closestObject(reflectionRay);
 
 		if (reflectionInfo.isIntersect)
 		{
@@ -20,7 +20,7 @@ void Reflection::getReflection(int depth, IntersectionInfo& intersectionInfo, Ma
 		
 			Color reflectanceColor = { 0,0,0 };
 
-			reflectanceColor = reflectanceColor + shading->shading((depth - 1), reflectionShape, reflectionInfo, *reflectionRay);
+			reflectanceColor = reflectanceColor + shading->shading((depth - 1), reflectionShape, reflectionInfo, reflectionRay);
 			
 			Color reflectance = {
 				(reflectanceColor.red * material.mirrorRef.x),
