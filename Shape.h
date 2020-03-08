@@ -14,6 +14,8 @@ enum ShapeType
 	MeshType
 	
 };
+class BoundingVolume;
+class Node;
 class BoundingBox;
 // Base class for any shape object
 class Shape
@@ -66,8 +68,10 @@ private:
 class Mesh: public Shape
 {
 public:
+	BoundingVolume* boundingVolume;
 	Mesh(void);	// Constructor
 	Mesh(int id, int matIndex, Material* material, const vector<Triangle>& faces, vector<int> *pIndices, vector<Vector3f> *vertices, ShapeType type);	// Constructor
+	void MeshVolumeIntersection(const Ray& ray, Node* node, IntersectionInfo* intersecion_info) const;
 	IntersectionInfo intersect(const Ray & ray) const; // Will take a ray and return a structure related to the intersection information. You will implement this.
 	BoundingBox* getBounds();
 private:

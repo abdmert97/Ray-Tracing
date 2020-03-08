@@ -32,6 +32,7 @@ Vector3f BoundingBox::getMax(Vector3f v1, Vector3f v2)
 
 float BoundingBox::isIntersect(Ray ray)
 {
+	
 	auto rayDirection = ray.direction;
 
 	auto rayOrigin = ray.origin;

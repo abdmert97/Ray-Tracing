@@ -51,8 +51,8 @@ void Scene::renderScene(void)
 		ImagePlane imagePlane = camera->imgPlane;
 		Image* image = new Image(imagePlane.nx, imagePlane.ny);
 	
-		//threading(camera, image);
-		renderImage(camera, image);
+		threading(camera, image);
+		//renderImage(camera, image);
 		image->saveImage(cameras[i]->imageName);
 	}
 }
@@ -162,6 +162,8 @@ void Scene::convertPPMToPNG(string ppmFileName, int osType)
 	}
 }
 
+
+
 void Scene::readXML(const char* xmlPath)
 {
 	const char* str;
@@ -205,6 +207,14 @@ void Scene::readXML(const char* xmlPath)
 
 		eResult = pCamera->QueryIntAttribute("id", &id);
 		const char* type = pCamera->Attribute("type");
+		if (type != nullptr && type[0] == 'l')
+		{
+
+			;
+
+
+			
+		}
 		camElement = pCamera->FirstChildElement("Position");
 		str = camElement->GetText();
 		sscanf(str, "%f %f %f", &pos.x, &pos.y, &pos.z);
@@ -330,6 +340,8 @@ void Scene::readXML(const char* xmlPath)
 		int cIndex;
 		float R;
 
+
+		
 		eResult = pObject->QueryIntAttribute("id", &id);
 		objElement = pObject->FirstChildElement("Material");
 		eResult = objElement->QueryIntText(&matIndex);
@@ -364,7 +376,7 @@ void Scene::readXML(const char* xmlPath)
 
 		pObject = pObject->NextSiblingElement("Triangle");
 	}
-
+	//readPly("hw2/ply/dragon_remeshed.ply");
 	// Parse meshes
 	pObject = pElement->FirstChildElement("Mesh");
 	while (pObject != nullptr)
@@ -378,39 +390,71 @@ void Scene::readXML(const char* xmlPath)
 		int vertexOffset = 0;
 		vector<Triangle> faces;
 		vector<int>* meshIndices = new vector<int>;
-
+		
+	
 		eResult = pObject->QueryIntAttribute("id", &id);
 		objElement = pObject->FirstChildElement("Material");
 		eResult = objElement->QueryIntText(&matIndex);
 		objElement = pObject->FirstChildElement("Faces");
-		objElement->QueryIntAttribute("vertexOffset", &vertexOffset);
-		str = objElement->GetText();
-		while (str[cursor] == ' ' || str[cursor] == '\t' || str[cursor] == '\n')
-			cursor++;
-		while (str[cursor] != '\0')
+		const char* type = objElement->Attribute("plyFile");
+		if (type != nullptr && type[0] == 'p')
 		{
-			for (int cnt = 0; cnt < 3; cnt++)
+			cout << type << endl;
+			
+			happly::PLYData plyIn("hw2/ply/dragon_remeshed.ply");
+
+			std::vector<std::array<double, 3>> vPos = plyIn.getVertexPositions();
+			std::vector<std::vector<size_t>> fInd = plyIn.getFaceIndices<size_t>();
+			Material* material = materials[matIndex - 1];
+			for (std::array<double, 3> vertex : vPos)
 			{
-				if (cnt == 0)
-					p1Index = atoi(str + cursor) + vertexOffset;
-				else if (cnt == 1)
-					p2Index = atoi(str + cursor) + vertexOffset;
-				else
-					p3Index = atoi(str + cursor) + vertexOffset;
-				while (str[cursor] != ' ' && str[cursor] != '\t' && str[cursor] != '\n')
-					cursor++;
-				while (str[cursor] == ' ' || str[cursor] == '\t' || str[cursor] == '\n')
-					cursor++;
+				vertices.push_back(Vector3f{ (float)vertex[0], (float)vertex[1], (float)vertex[2] });
+				
+			}
+			for (std::vector<size_t> vertex : fInd)
+			{
+				faces.push_back(*(new Triangle(id, matIndex - 1, material, p1Index, p2Index, p3Index, &vertices, TriangleShape)));
+				meshIndices->push_back(p1Index);
+				meshIndices->push_back(p2Index);
+				meshIndices->push_back(p3Index);
+			}
+			objects.push_back(new Mesh(idCount++, matIndex - 1, material, faces, meshIndices, &vertices, MeshType));
+		
+			
+			
+		}
+		else
+		{
+			objElement->QueryIntAttribute("vertexOffset", &vertexOffset);
+			str = objElement->GetText();
+			while (str[cursor] == ' ' || str[cursor] == '\t' || str[cursor] == '\n')
+				cursor++;
+			while (str[cursor] != '\0')
+			{
+				for (int cnt = 0; cnt < 3; cnt++)
+				{
+					if (cnt == 0)
+						p1Index = atoi(str + cursor) + vertexOffset;
+					else if (cnt == 1)
+						p2Index = atoi(str + cursor) + vertexOffset;
+					else
+						p3Index = atoi(str + cursor) + vertexOffset;
+					while (str[cursor] != ' ' && str[cursor] != '\t' && str[cursor] != '\n')
+						cursor++;
+					while (str[cursor] == ' ' || str[cursor] == '\t' || str[cursor] == '\n')
+						cursor++;
+				}
+				Material* material = materials[matIndex - 1];
+				faces.push_back(*(new Triangle(id, matIndex - 1, material, p1Index, p2Index, p3Index, &vertices, TriangleShape)));
+				meshIndices->push_back(p1Index);
+				meshIndices->push_back(p2Index);
+				meshIndices->push_back(p3Index);
 			}
 			Material* material = materials[matIndex - 1];
-			faces.push_back(*(new Triangle(id, matIndex-1,material, p1Index, p2Index, p3Index, &vertices,TriangleShape)));
-			meshIndices->push_back(p1Index);
-			meshIndices->push_back(p2Index);
-			meshIndices->push_back(p3Index);
-		}
-		Material* material = materials[matIndex - 1];
-		objects.push_back(new Mesh(idCount++, matIndex-1,material, faces, meshIndices, &vertices,MeshType));
+			objects.push_back(new Mesh(idCount++, matIndex - 1, material, faces, meshIndices, &vertices, MeshType));
 
+			
+		}
 		pObject = pObject->NextSiblingElement("Mesh");
 	}
 
@@ -462,15 +506,7 @@ void Scene::setScene()
 	}
 	cameraCount = cameras.size();
 }
-void Scene::readPly(const char* fileName)
-{
-	happly::PLYData plyIn(fileName);
 
-
-	std::vector<std::array<double, 3>> vPos = plyIn.getVertexPositions();
-	std::vector<std::vector<size_t>> fInd = plyIn.getFaceIndices<size_t>();
-
-}
 void Scene::initObjects()
 {
 	setScene();

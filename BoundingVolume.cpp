@@ -5,39 +5,74 @@
 void BoundingVolume::build(Node* node)
 {
 	int size = node->ObjectIDs.size();
-/*	for (int i : node->ObjectIDs)
-		cout << i;
-	cout << endl;*/
-	vector<Vector3f> midpoints;
+
+
 	for(int i = 0; i< size;i++)
 	{
 		Shape* shape = objects[node->ObjectIDs[i]];
 		BoundingBox *bounds = shape->getBounds();
 		node->boundingBox->extend(bounds);
-		midpoints.push_back(bounds->midPoint());
-		
 	}
-	if (size <= 2) return;
-	
-	
+	if (size <= 1) return;
+	vector<std::pair<Vector3f, int>> midpoints;
+	for (int i = 0; i < size; i++)
+	{
+		Shape* shape = objects[node->ObjectIDs[i]];
+		BoundingBox* bounds = shape->getBounds();
+		midpoints.emplace_back(bounds->midPoint(), node->ObjectIDs[i]);
+	}
 	std::sort(midpoints.begin(), midpoints.end());
-	Vector3f midPoint = midpoints[midpoints.size() / 2];
+
 	
 	node->left = new Node;
 	node->right = new Node;
 	for (int i = 0; i < size; i++)
 	{
-		Shape* shape = objects[node->ObjectIDs[i]];
-		BoundingBox* shapeBound = shape->getBounds();
-		if (i<=size/2)
+		if (i<size/2)
 		{
-			node->left->ObjectIDs.push_back(node->ObjectIDs[i]);
+			node->left->ObjectIDs.push_back(midpoints[i].second);
 		}
 		else
-			node->right->ObjectIDs.push_back(node->ObjectIDs[i]);
+			node->right->ObjectIDs.push_back(midpoints[i].second);
 	}
 	build(node->left);
 	build(node->right);
+}
+void BoundingVolume::buildMeshVolume(Node* node)
+{
+	int size = node->ObjectIDs.size();
+	
+	for (int i = 0; i < size; i++)
+	{
+		Triangle shape = (*triangles)[node->ObjectIDs[i]];
+		BoundingBox* bounds = shape.getBounds();
+		node->boundingBox->extend(bounds);
+	}
+	if (size <= 1) return;
+	vector<std::pair<Vector3f,int>> midpoints;
+	for (int i = 0; i < size; i++)
+	{
+		Triangle shape = (*triangles)[node->ObjectIDs[i]];
+		BoundingBox* bounds = shape.getBounds();
+		midpoints.emplace_back(bounds->midPoint(), node->ObjectIDs[i]);
+	}
+	std::sort(midpoints.begin(), midpoints.end());
+
+
+	node->left = new Node;
+	node->right = new Node;
+	for (int i = 0; i < size; i++)
+	{
+
+		if (i < size / 2)
+		{
+			node->left->ObjectIDs.push_back(midpoints[i].second);
+		}
+		else
+			node->right->ObjectIDs.push_back(midpoints[i].second);
+	}
+	buildMeshVolume(node->left);
+	buildMeshVolume(node->right);
 }
 bool BoundingVolume::isInLeft(const Vector3f& midPoint, BoundingBox* bounding_box)
 {
@@ -45,7 +80,4 @@ bool BoundingVolume::isInLeft(const Vector3f& midPoint, BoundingBox* bounding_bo
 		return true;
 	return false;
 }
-bool BoundingVolume::sortVector(const Vector3f &v1,const Vector3f &v2)
-{
-	return v1.x >= v2.x;
-}
+

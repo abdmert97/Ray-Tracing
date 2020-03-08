@@ -27,7 +27,7 @@ Sphere::Sphere(int id, int matIndex, Material* material, int cIndex, float R, ve
 {
 this->radius = R;
 this->center = (*pVertices)[cIndex-1];
-
+getBounds();
 }
 
 /* Sphere-ray intersection routine. You will implement this.
@@ -92,6 +92,7 @@ BoundingBox* Mesh::getBounds()
 {
 	if (bounds == nullptr)
 	{
+		boundingVolume = new BoundingVolume(faces);
 		bounds = new BoundingBox();
 		for (Triangle triangle : faces)
 		{
@@ -113,6 +114,7 @@ Triangle::Triangle(int id, int matIndex, Material* material, int p1Index, int p2
     point1 = pVertices[0][p1Index-1];
     point2 = pVertices[0][p2Index-1];
     point3 = pVertices[0][p3Index-1];
+	getBounds();
 }
 
 /* Triangle-ray intersection routine. You will implement this.
@@ -183,6 +185,49 @@ Mesh::Mesh()
 Mesh::Mesh(int id, int matIndex, Material* material, const vector<Triangle>& faces, vector<int> *pIndices, vector<Vector3f> *pVertices, ShapeType type)
     : Shape(id, matIndex,material,type),faces(faces)
 {
+	for (Triangle triangle : faces)
+		triangle.getBounds();
+	getBounds();
+}
+
+void Mesh::MeshVolumeIntersection(const Ray& ray, Node* node, IntersectionInfo* intersecion_info) const
+{
+	float t_min = intersecion_info->t;
+	float t_intersection = node->boundingBox->isIntersect(ray);
+
+	if (t_intersection != -1)
+	{
+		if (node->left != nullptr)
+		{
+			MeshVolumeIntersection(ray, node->left, intersecion_info);
+		}
+		if (node->right != nullptr)
+		{
+			MeshVolumeIntersection(ray, node->right, intersecion_info);
+		}
+
+		if (node->left == nullptr || node->right == nullptr)
+		{
+
+			for (int i = 0; i < node->ObjectIDs.size(); i++)
+			{
+				const Triangle *shape = &faces[node->ObjectIDs[i]];
+				
+				if (shape->bounds->isIntersect(ray) == -1) continue;;
+				IntersectionInfo intesectionInfo = shape->intersect(ray);
+				if (intesectionInfo.isIntersect == true)
+				{
+					if (intesectionInfo.t <= t_min)
+					{
+						t_min = intesectionInfo.t;
+						intesectionInfo.objectID = node->ObjectIDs[i];
+						*intersecion_info = intesectionInfo;
+					}
+
+				}
+			}
+		}
+	}
 
 }
 
@@ -193,26 +238,19 @@ IntersectionInfo Mesh::intersect(const Ray & ray) const
 {
     int size = faces.size();
 
-	IntersectionInfo returnVal = {};
-	returnVal.isIntersect = false;
-	returnVal.objectID = -1;
-	float t =INT_MAX;
-    for(int i = 0 ; i < size;i++)
-    {
-        IntersectionInfo tempReturnVal= faces[i].intersect(ray);
-		
-		tempReturnVal.objectID = id;
-		if (tempReturnVal.isIntersect)
-		{
-			// Select closest of faces intersecting
-			if(tempReturnVal.t<t)
-			{
-				t = tempReturnVal.t;
-				returnVal = tempReturnVal;
-				returnVal.isIntersect = true;
-			}
-		}
-    }
 
-    return returnVal;
+	IntersectionInfo returnValue{};
+
+	float t = 9999;
+	returnValue.t = t;
+	Node* node = boundingVolume->root;
+	
+	MeshVolumeIntersection(ray, node, &returnValue);
+
+
+
+	return  returnValue;
+
+	
+
 }

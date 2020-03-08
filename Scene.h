@@ -59,6 +59,7 @@ public:
 	void renderScene(void);			// Method to render scene, an image is created for each camera in the scene. You will implement this.
 	void renderImage(int part, Camera* camera, Image* image);
 	void convertPPMToPNG(string ppmFileName, int osType);
+	void readPly(const char* str, const vector<Triangle>& faces, vector<int>* is);
 	void readXML(const char* xmlPath);
 
 

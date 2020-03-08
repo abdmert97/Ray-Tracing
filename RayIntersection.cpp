@@ -27,18 +27,17 @@ void RayIntersection::BoundingBoxIntersection(Ray ray,Node *node,IntersectionInf
 		
 			for (int i = 0; i < node->ObjectIDs.size(); i++)
 			{
-				Shape* shape = objects[node->ObjectIDs[i]];
+				const Shape* shape = objects[node->ObjectIDs[i]];
+				if (shape->bounds->isIntersect(ray) == -1) continue;;
 				IntersectionInfo intesectionInfo = shape->intersect(ray);
 				if (intesectionInfo.isIntersect == true)
 				{
-				
 					if (intesectionInfo.t <= t_min)
 					{
 						t_min = intesectionInfo.t;
 						intesectionInfo.objectID = node->ObjectIDs[i];
 						*retVal = intesectionInfo;
 					}
-					
 				}
 			}
 		}
@@ -57,7 +56,7 @@ IntersectionInfo RayIntersection::closestObject(Ray ray)
 	float t = 9999;
 	returnValue.t = t;
 	Node* node = boundingVolume->root;
-	if(t>1)
+
 	BoundingBoxIntersection(ray,node,&returnValue);
 	
 	// Selecting Closest object to the camera
