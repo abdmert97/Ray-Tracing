@@ -64,11 +64,11 @@ public:
 
 
 private:
-	void renderImagePart(int part, Camera* camera, Image* image);
-	void renderImage(Camera* camera, Image* image);
-	
 
-	
+	void renderImage(Camera* camera, Image* image);
+	void renderImagePart(float start, float end, Camera* camera, Image* image);
+
+
 	int cameraCount;
 	int lightCount;
 	int objectCount;
