@@ -32,9 +32,9 @@ Ray Camera::getPrimaryRay(int col, int row) const
 {
     Vector3f pixelPosition = pixelPositionOnImagePlane(row,col);
 
-    Ray *ray = new Ray(pos,normalizeVector(pixelPosition-pos));
+    Ray ray = Ray(pos,normalizeVector(pixelPosition-pos));
 
-    return *ray;
+    return ray;
 }
 
 Vector3f Camera::pixelPositionOnImagePlane(int row ,int column ) const

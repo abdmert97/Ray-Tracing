@@ -104,18 +104,20 @@ void Scene::renderImagePart(int part, Camera* camera, Image* image)
 
 		ImagePlane imagePlane = camera->imgPlane;
 		IntersectionInfo returnValue;
+		IntersectionInfo closestObjectReturnVal;
 		Shape* shape;
 		Color color = { 0,0,0 };
 		int maxWidth = (imagePlane.nx / 8) * (part + 1);
-		for (int w = (imagePlane.nx / 8) * part; w < maxWidth; w++)
+		int maxHeight = (imagePlane.ny / 8) * (part + 1);
+		for (int w = 0; w <imagePlane.nx; w++)
 		{
 
-			for (int h = 0; h < imagePlane.ny; h++)
+			for (int h = (imagePlane.ny / 8) * part; h < maxHeight; h++)
 			{
 				Ray ray = camera->getPrimaryRay(w, h);
 				
 				// Selecting Closest object to the camera
-				IntersectionInfo closestObjectReturnVal = rayIntersection->closestObject(ray);
+				closestObjectReturnVal = rayIntersection->closestObject(ray);
 				if (closestObjectReturnVal.isIntersect == false) // ray hits nothing
 				{
 					// Set background Color 
@@ -133,6 +135,7 @@ void Scene::renderImagePart(int part, Camera* camera, Image* image)
 				}
 			}
 		}
+		
 }
 
 
@@ -411,9 +414,9 @@ void Scene::readXML(const char* xmlPath)
 			}
 			for (std::vector<int> vertex : fInd)
 			{
-				p1Index = vertex[0]+currID;
-				p2Index = vertex[1]+currID;
-				p3Index = vertex[2]+currID;
+				p1Index = vertex[0]+currID+1;
+				p2Index = vertex[1]+currID+1;
+				p3Index = vertex[2]+currID+1;
 
 				faces.push_back(*(new Triangle(id, matIndex - 1, material, p1Index, p2Index, p3Index, &vertices, TriangleShape)));
 				meshIndices->push_back(p1Index);

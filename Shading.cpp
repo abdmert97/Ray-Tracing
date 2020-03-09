@@ -44,7 +44,7 @@ Color Shading::shading(int depth, Shape*& shape, IntersectionInfo& closestObject
 
 		}
 	}
-	
+	//yukarý al
 
 	// Reflection
 	if (material.materialType == Default)

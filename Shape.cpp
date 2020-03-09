@@ -145,26 +145,27 @@ IntersectionInfo Triangle::intersect(const Ray & ray) const
             {point1.z-rayOrigin.z, point1.z-point3.z, rayDirection.z}
 
     };
-
+	float beta = determinant(betaMatrix) / determinantA;
+	if (beta < 0) return returnValue;
     float gammaMatrix[3][3] = {
             {point1.x-point2.x, point1.x-rayOrigin.x, rayDirection.x},
             {point1.y-point2.y, point1.y-rayOrigin.y, rayDirection.y},
             {point1.z-point2.z, point1.z-rayOrigin.z, rayDirection.z}
 
     };
-
+	float gamma = determinant(gammaMatrix) / determinantA;
+	if (gamma < 0) return returnValue;
     float tMatrix[3][3] = {
             {point1.x-point2.x, point1.x-point3.x, point1.x-rayOrigin.x},
             {point1.y-point2.y, point1.y-point3.y, point1.y-rayOrigin.y},
             {point1.z-point2.z, point1.z-point3.z, point1.z-rayOrigin.z}
 
     };
- 
 
-    float beta = determinant(betaMatrix)/determinantA;
-    float gamma = determinant(gammaMatrix)/determinantA;
-    float t = determinant(tMatrix)/determinantA;
-    if(beta+gamma<=1&&beta>=0&&gamma>=0&&t>0.001)
+
+  
+	float t = determinant(tMatrix)/determinantA;
+    if(beta+gamma<=1&&t>0.001)
     {
 		returnValue.objectID = id;
         returnValue.isIntersect = true;
@@ -173,7 +174,6 @@ IntersectionInfo Triangle::intersect(const Ray & ray) const
 		Vector3f crossProduct = (point2 - point1) * (point3 - point1);
 		returnValue.hitNormal = crossProduct.normalizeVector();
     }
-
 
     return returnValue;
 }
@@ -192,7 +192,6 @@ Mesh::Mesh(int id, int matIndex, Material* material, const vector<Triangle>& fac
 
 void Mesh::MeshVolumeIntersection(const Ray& ray, Node* node, IntersectionInfo* intersecion_info) const
 {
-	
 	float t_int = node->boundingBox.isIntersect(ray);
 	if (t_int != -1 && intersecion_info->t>= t_int)
 	{
@@ -221,7 +220,6 @@ void Mesh::MeshVolumeIntersection(const Ray& ray, Node* node, IntersectionInfo* 
 						intesectionInfo.objectID = node->ObjectIDs[0];
 						*intersecion_info = intesectionInfo;
 					}
-
 				}
 			}
 		}
