@@ -12,14 +12,17 @@ int Scene::maxRecursionDepth = 0;
 
 void Scene::threading(Camera* camera, Image* image)
 {
-	std::thread td0(&Scene::renderImagePart, this, 0, camera, image);
-	std::thread td1(&Scene::renderImagePart, this, 1, camera, image);
-	std::thread td2(&Scene::renderImagePart, this, 2, camera, image);
-	std::thread td3(&Scene::renderImagePart, this, 3, camera, image);
-	std::thread td4(&Scene::renderImagePart, this, 4, camera, image);
-	std::thread td5(&Scene::renderImagePart, this, 5, camera, image);
-	std::thread td6(&Scene::renderImagePart, this, 6, camera, image);
-	std::thread td7(&Scene::renderImagePart, this, 7, camera, image);
+
+	int height = image->height;
+	
+	std::thread td0(&Scene::renderImagePart, this, 0,(float)9/32, camera, image);
+	std::thread td1(&Scene::renderImagePart, this, (float)9/32,(float)13/32, camera, image);
+	std::thread td2(&Scene::renderImagePart, this, (float)13/32,(float)15/32, camera, image);
+	std::thread td3(&Scene::renderImagePart, this, (float)15/32,(float)16/32, camera, image);
+	std::thread td4(&Scene::renderImagePart, this, (float)16/32,(float)17/32, camera, image);
+	std::thread td5(&Scene::renderImagePart, this, (float)17/32,(float)19/32, camera, image);
+	std::thread td6(&Scene::renderImagePart, this, (float)19/32,(float)23/32, camera, image);
+	std::thread td7(&Scene::renderImagePart, this, (float)23/32,(float)32/32, camera, image);
 		
 	td0.join();
 	//cout << "part1 rendered" << endl;
@@ -99,7 +102,7 @@ void Scene::renderImage(Camera* camera, Image* image)
 		}
 	}
 }
-void Scene::renderImagePart(int part, Camera* camera, Image* image)
+void Scene::renderImagePart(float start,float end, Camera* camera, Image* image)
 {
 
 		ImagePlane imagePlane = camera->imgPlane;
@@ -107,13 +110,13 @@ void Scene::renderImagePart(int part, Camera* camera, Image* image)
 		IntersectionInfo closestObjectReturnVal;
 		Shape* shape;
 		Color color = { 0,0,0 };
-		int maxWidth = (imagePlane.nx / 8) * (part + 1);
-		int maxHeight = (imagePlane.ny / 8) * (part + 1);
+
 		for (int w = 0; w <imagePlane.nx; w++)
 		{
 
-			for (int h = (imagePlane.ny / 8) * part; h < maxHeight; h++)
+			for (int h =start*imagePlane.ny; h < end* imagePlane.ny; h++)
 			{
+				
 				Ray ray = camera->getPrimaryRay(w, h);
 				
 				// Selecting Closest object to the camera
@@ -133,6 +136,8 @@ void Scene::renderImagePart(int part, Camera* camera, Image* image)
 					//  cout<<(int)color.red<< " "<<(int)color.grn<< " "<<(int)color.blu<< " "<<endl;
 					image->setPixelValue(w, h, color);
 				}
+				
+				
 			}
 		}
 		
