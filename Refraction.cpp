@@ -87,13 +87,13 @@ void Refraction::refraction(int depth, Ray ray,IntersectionInfo& intersection,Ma
 		Vector3f refractionRayOrig = outside ? hitPoint - bias : hitPoint + bias;
 
 		Shape* intersectShape = (*objects)[intersection.objectID];
-		Ray* reflectionRay = new Ray(refractionRayOrig, refractionDirection);
-		IntersectionInfo refractionIntersect = rayIntersection->closestObject(*reflectionRay);
+		Ray reflectionRay = Ray(refractionRayOrig, refractionDirection);
+		IntersectionInfo refractionIntersect = rayIntersection->closestObject(reflectionRay);
 		if(refractionIntersect.isIntersect)
 		{
 			Shape* refractionShape = (*objects)[refractionIntersect.objectID];
 			
-			refractionColor = shading->shading(depth - 1, refractionShape, refractionIntersect, *reflectionRay,n_i);
+			refractionColor = shading->shading(depth - 1, refractionShape, refractionIntersect, reflectionRay,n_i);
 			
 		}
 		
