@@ -15,15 +15,18 @@ void Scene::threading(Camera* camera, Image* image)
 
 	int height = image->height;
 	
-	std::thread td0(&Scene::renderImagePart, this, 0,(float)9/32, camera, image);
-	std::thread td1(&Scene::renderImagePart, this, (float)9/32,(float)13/32, camera, image);
-	std::thread td2(&Scene::renderImagePart, this, (float)13/32,(float)15/32, camera, image);
-	std::thread td3(&Scene::renderImagePart, this, (float)15/32,(float)16/32, camera, image);
-	std::thread td4(&Scene::renderImagePart, this, (float)16/32,(float)17/32, camera, image);
-	std::thread td5(&Scene::renderImagePart, this, (float)17/32,(float)19/32, camera, image);
-	std::thread td6(&Scene::renderImagePart, this, (float)19/32,(float)23/32, camera, image);
-	std::thread td7(&Scene::renderImagePart, this, (float)23/32,(float)32/32, camera, image);
-		
+	std::thread td0(&Scene::renderImagePart, this, 0,(float)10/64, camera, image);
+	std::thread td1(&Scene::renderImagePart, this, (float)10/64,(float)18/64, camera, image);
+	std::thread td2(&Scene::renderImagePart, this, (float)18/64,(float)25/64, camera, image);
+	std::thread td3(&Scene::renderImagePart, this, (float)25/64,(float)31/64, camera, image);
+	std::thread td4(&Scene::renderImagePart, this, (float)31/64,(float)32/64, camera, image);
+	std::thread td5(&Scene::renderImagePart, this, (float)32/64,(float)33/64, camera, image);
+	std::thread td6(&Scene::renderImagePart, this, (float)33/64,(float)34/64, camera, image);
+	std::thread td7(&Scene::renderImagePart, this, (float)35/32,(float)36/64, camera, image);
+	std::thread td8(&Scene::renderImagePart, this, (float)37/64,(float)38/64, camera, image);
+	std::thread td9(&Scene::renderImagePart, this, (float)38/64,(float)46/64, camera, image);
+	std::thread tda(&Scene::renderImagePart, this, (float)46/64,(float)53/64, camera, image);
+	std::thread tdb(&Scene::renderImagePart, this, (float)53/64,(float)64/64, camera, image);
 	td0.join();
 	//cout << "part1 rendered" << endl;
 	td1.join();
@@ -39,6 +42,11 @@ void Scene::threading(Camera* camera, Image* image)
 	td6.join();
 	//cout << "part7 rendered" << endl;
 	td7.join();
+	td8.join();
+	td9.join();
+	tda.join();
+	tdb.join();
+	
 	//cout << "part8 rendered" << endl;
 }
 
