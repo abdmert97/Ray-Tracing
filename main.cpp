@@ -9,8 +9,9 @@ int main(int argc, char *argv[])
 	
 
 	/* Do your stuff here */
-	const char *xmlPath = "hw2/chinese_dragon.xml" ;
-    cout<< xmlPath<<endl;
+	const char *xmlPath ;
+	xmlPath = "hw2/scienceTree.xml";
+
 	clock_t tStart = clock();
 	for (int i = 0; i < 1; i++) 
 	{

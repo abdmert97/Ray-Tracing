@@ -22,8 +22,8 @@ void Scene::threading(Camera* camera, Image* image)
 	std::thread td4(&Scene::renderImagePart, this, (float)31/64,(float)32/64, camera, image);
 	std::thread td5(&Scene::renderImagePart, this, (float)32/64,(float)33/64, camera, image);
 	std::thread td6(&Scene::renderImagePart, this, (float)33/64,(float)34/64, camera, image);
-	std::thread td7(&Scene::renderImagePart, this, (float)35/32,(float)36/64, camera, image);
-	std::thread td8(&Scene::renderImagePart, this, (float)37/64,(float)38/64, camera, image);
+	std::thread td7(&Scene::renderImagePart, this, (float)34/64,(float)36/64, camera, image);
+	std::thread td8(&Scene::renderImagePart, this, (float)36/64,(float)38/64, camera, image);
 	std::thread td9(&Scene::renderImagePart, this, (float)38/64,(float)46/64, camera, image);
 	std::thread tda(&Scene::renderImagePart, this, (float)46/64,(float)53/64, camera, image);
 	std::thread tdb(&Scene::renderImagePart, this, (float)53/64,(float)64/64, camera, image);
@@ -114,7 +114,7 @@ void Scene::renderImagePart(float start,float end, Camera* camera, Image* image)
 {
 
 		ImagePlane imagePlane = camera->imgPlane;
-		IntersectionInfo returnValue;
+	
 		IntersectionInfo closestObjectReturnVal;
 		Shape* shape;
 		Color color = { 0,0,0 };
