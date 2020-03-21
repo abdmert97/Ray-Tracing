@@ -6,7 +6,8 @@ Vector3f Reflection::reflect(const Vector3f& incoming, const Vector3f& normal)
 }
 void Reflection::getReflection(int depth, IntersectionInfo& intersectionInfo, Material material, Color& color, Vector3f cameraVectorNormalized)
 {
-	if (material.materialType != Default)
+	if(depth <=0) return;
+	if (material.materialType == Mirror ||material.materialType == Conductor || material.materialType == Dialectic)
 	{
 		
 		Vector3f reflectionDirection = reflect(cameraVectorNormalized * -1, intersectionInfo.hitNormal).normalizeVector();

@@ -112,7 +112,9 @@ void Refraction::refraction(int depth, Ray ray,IntersectionInfo& intersection,Ma
 	
 	Color reflectionColor = { 0,0,0 };
 	Vector3f cameraVector = (ray.origin - intersection.intersectionPoint).normalizeVector();
+	if(depth>0)
 	reflection->getReflection(depth, intersection, material, reflectionColor, cameraVector);
+	
 
 	// mix the two
 	if (material.materialType == Dialectic)

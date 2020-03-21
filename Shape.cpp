@@ -192,17 +192,10 @@ Mesh::Mesh(int id, int matIndex, Material* material, const vector<Triangle>& fac
 
 void Mesh::MeshVolumeIntersection(const Ray& ray, Node* node, IntersectionInfo* intersecion_info) const
 {
+	
 	float t_int = node->boundingBox.isIntersect(ray);
-	if (t_int != -1 && intersecion_info->t>= t_int)
+	if (t_int != -1 && t_int <= intersecion_info->t)
 	{
-		if (node->left != nullptr )
-		{
-			MeshVolumeIntersection(ray, node->left, intersecion_info);
-		}
-		if (node->right != nullptr)
-		{
-			MeshVolumeIntersection(ray, node->right, intersecion_info);
-		}
 
 		if (node->left == nullptr && node->right == nullptr)
 		{
@@ -222,6 +215,14 @@ void Mesh::MeshVolumeIntersection(const Ray& ray, Node* node, IntersectionInfo* 
 					}
 				}
 			}
+		}
+		if (node->left != nullptr)
+		{
+			MeshVolumeIntersection(ray, node->left, intersecion_info);
+		}
+		if (node->right != nullptr)
+		{
+			MeshVolumeIntersection(ray, node->right, intersecion_info);
 		}
 	}
 

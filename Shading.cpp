@@ -17,8 +17,8 @@ Color Shading::shading(int depth, Shape*& shape, IntersectionInfo& closestObject
 	bool isInside = ray.direction.dotProduct(closestObjectInfo.hitNormal) > 0;
 	
 	Color color = { 0,0,0 };
-	Vector3f cameraVector = (ray.origin - closestObjectInfo.intersectionPoint);
-	Vector3f cameraVectorNormalized = cameraVector.normalizeVector();
+	Vector3f cameraVectorNormalized = (ray.origin - closestObjectInfo.intersectionPoint).normalizeVector();
+	
 	if(!isInside)
 	{
 		color = ambientLightList[shape->matIndex];
@@ -45,13 +45,13 @@ Color Shading::shading(int depth, Shape*& shape, IntersectionInfo& closestObject
 		}
 	}
 	//yukarý al
-
-	// Reflection
+	if (depth <= 0)
+		return color;
 	if (material.materialType == Default)
 		return color;
 	if (material.materialType == Mirror)
 		reflection->getReflection(depth, closestObjectInfo, material, color, cameraVectorNormalized);
-	else
+	else if (material.materialType == Conductor || material.materialType == Dialectic)
 		refraction->refraction(depth, ray, closestObjectInfo, material, color,ray.direction,n_t);
 	return color;
 }

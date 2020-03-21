@@ -36,7 +36,7 @@ void SetMax(T& val0, const T& val1) { val0 = val0 < val1 ? val1 : val0; }
 template<typename T>
 void SetMin(T& val0, const T& val1) { val0 = val0 > val1 ? val1 : val0; }
 
-int BoundingBox::isIntersect(Ray r)
+float BoundingBox::isIntersect(Ray r)
 {
 	
 	// Initialize with min and max values
@@ -86,7 +86,7 @@ int BoundingBox::isIntersect(Ray r)
 		return -1;
 	// -- 
 
-	return 1;
+	return tn;
 }
 
 
