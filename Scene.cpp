@@ -463,6 +463,32 @@ void Scene::readXML(const char* xmlPath)
 		eResult = pObject->QueryIntAttribute("id", &id);
 		objElement = pObject->FirstChildElement("Material");
 		eResult = objElement->QueryIntText(&matIndex);
+		
+		vector<std::pair<char, int>> transformList;
+		objElement = pObject->FirstChildElement("Transformations");
+		if (objElement != nullptr)
+		{
+			int cursor = 0;
+
+			str = objElement->GetText();
+			while (str[cursor] == ' ' || str[cursor] == '\t' || str[cursor] == '\n')
+				cursor++;
+
+			while (str[cursor] != '\0')
+			{
+				std::pair<char, int> transform;
+				transform.first = str[cursor++];
+				transform.second = char(str[cursor++]) - '0';
+
+				while (str[cursor] == ' ' || str[cursor] == '\t' || str[cursor] == '\n')
+					cursor++;
+				cout << transform.first << " first " << transform.second << endl;
+				transformList.push_back(transform);
+			}
+		}
+
+		
+		
 		objElement = pObject->FirstChildElement("Faces");
 		const char* type = objElement->Attribute("plyFile");
 		if (type != nullptr && type[0] == 'p')
@@ -485,12 +511,12 @@ void Scene::readXML(const char* xmlPath)
 				p2Index = vertex[1]+currID+1;
 				p3Index = vertex[2]+currID+1;
 
-				faces.push_back(*(new Triangle(id, matIndex - 1, material, p1Index, p2Index, p3Index, &vertices, TriangleShape)));
+				faces.push_back(*(new Triangle(id, matIndex - 1, material, p1Index, p2Index, p3Index, &vertices, TriangleShape, transformList)));
 				meshIndices->push_back(p1Index);
 				meshIndices->push_back(p2Index);
 				meshIndices->push_back(p3Index);
 			}
-			objects.push_back(new Mesh(idCount++, matIndex - 1, material, faces, meshIndices, &vertices, MeshType));
+			objects.push_back(new Mesh(idCount++, matIndex - 1, material, faces, meshIndices, &vertices, MeshType, transformList));
 		
 			
 			
@@ -517,19 +543,21 @@ void Scene::readXML(const char* xmlPath)
 						cursor++;
 				}
 				Material* material = materials[matIndex - 1];
-				faces.push_back(*(new Triangle(id, matIndex - 1, material, p1Index, p2Index, p3Index, &vertices, TriangleShape)));
+				faces.push_back(*(new Triangle(id, matIndex - 1, material, p1Index, p2Index, p3Index, &vertices, TriangleShape, transformList)));
 				meshIndices->push_back(p1Index);
 				meshIndices->push_back(p2Index);
 				meshIndices->push_back(p3Index);
 			}
 			Material* material = materials[matIndex - 1];
-			objects.push_back(new Mesh(idCount++, matIndex - 1, material, faces, meshIndices, &vertices, MeshType));
+			objects.push_back(new Mesh(idCount++, matIndex - 1, material, faces, meshIndices, &vertices, MeshType, transformList));
 
 			
 		}
 		pObject = pObject->NextSiblingElement("Mesh");
 	}
- pObject = pElement->FirstChildElement("Sphere");
+
+	// Parse spheres
+	pObject = pElement->FirstChildElement("Sphere");
 
 	while (pObject != nullptr)
 	{
@@ -543,12 +571,37 @@ void Scene::readXML(const char* xmlPath)
 		eResult = pObject->QueryIntAttribute("id", &id);
 		objElement = pObject->FirstChildElement("Material");
 		eResult = objElement->QueryIntText(&matIndex);
+		
+		vector<std::pair<char, int>> transformList;
+		objElement = pObject->FirstChildElement("Transformations");
+		if (objElement != nullptr)
+		{
+			int cursor = 0;
+
+			str = objElement->GetText();
+			while (str[cursor] == ' ' || str[cursor] == '\t' || str[cursor] == '\n')
+				cursor++;
+
+			while (str[cursor] != '\0')
+			{
+				std::pair<char, int> transform;
+				transform.first = str[cursor++];
+				transform.second = char(str[cursor++]) - '0';
+
+				while (str[cursor] == ' ' || str[cursor] == '\t' || str[cursor] == '\n')
+					cursor++;
+				cout << transform.first << " first " << transform.second << endl;
+				transformList.push_back(transform);
+			}
+		}
+		
+		
 		objElement = pObject->FirstChildElement("Center");
 		eResult = objElement->QueryIntText(&cIndex);
 		objElement = pObject->FirstChildElement("Radius");
 		eResult = objElement->QueryFloatText(&R);
 		Material* material = materials[matIndex - 1];
-		objects.push_back(new Sphere(idCount++, matIndex - 1, material, cIndex, R, &vertices, SphereType));
+		objects.push_back(new Sphere(idCount++, matIndex - 1, material, cIndex, R, &vertices, SphereType, transformList));
 
 		pObject = pObject->NextSiblingElement("Sphere");
 	}
@@ -566,11 +619,35 @@ void Scene::readXML(const char* xmlPath)
 		eResult = pObject->QueryIntAttribute("id", &id);
 		objElement = pObject->FirstChildElement("Material");
 		eResult = objElement->QueryIntText(&matIndex);
+
+		vector<std::pair<char, int>> transformList;
+		objElement = pObject->FirstChildElement("Transformations");
+		if (objElement != nullptr)
+		{
+			int cursor = 0;
+
+			str = objElement->GetText();
+			while (str[cursor] == ' ' || str[cursor] == '\t' || str[cursor] == '\n')
+				cursor++;
+
+			while (str[cursor] != '\0')
+			{
+				std::pair<char, int> transform;
+				transform.first = str[cursor++];
+				transform.second = char(str[cursor++]) - '0';
+
+				while (str[cursor] == ' ' || str[cursor] == '\t' || str[cursor] == '\n')
+					cursor++;
+				cout << transform.first << " first " << transform.second << endl;
+				transformList.push_back(transform);
+			}
+		}
+		
 		objElement = pObject->FirstChildElement("Indices");
 		str = objElement->GetText();
 		sscanf(str, "%d %d %d", &p1Index, &p2Index, &p3Index);
 		Material* material = materials[matIndex - 1];
-		objects.push_back(new Triangle(idCount++, matIndex - 1, material, p1Index, p2Index, p3Index, &vertices, TriangleShape));
+		objects.push_back(new Triangle(idCount++, matIndex - 1, material, p1Index, p2Index, p3Index, &vertices, TriangleShape, transformList));
 
 		pObject = pObject->NextSiblingElement("Triangle");
 	}
