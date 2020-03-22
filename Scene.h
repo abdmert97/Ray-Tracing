@@ -16,6 +16,7 @@
 #include "Reflection.h"
 #include "BoundingVolume.h"
 #include "happly.h"
+#include "Transformation.h"
 class Shading;
 class RayIntersection;
 class Reflection;
@@ -49,6 +50,7 @@ public:
 	Reflection* reflection;
 	Refraction* refraction;
 	BoundingVolume* boundingVolume;
+	Transformation* transformation;
 	void initObjects();
 	Scene(const char *xmlPath);		// Constructor. Parses XML file and initializes vectors above. Implemented for you.
 

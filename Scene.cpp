@@ -358,7 +358,61 @@ void Scene::readXML(const char* xmlPath)
 		
 		pMaterial = pMaterial->NextSiblingElement("Material");
 	}
+	// Parse transformations
+	pElement = pRoot->FirstChildElement("Transformations");
+	XMLElement* translation = pElement->FirstChildElement("Translation");
+	while (translation != nullptr)
+	{
+		int id;
+		eResult = translation->QueryIntAttribute("id",&id);
+			vec3 trans;
+			str = translation->GetText();
+			sscanf(str, "%f %f %f", &trans.x,
+				&trans.y, &trans.z);
+			cout << trans.x <<  " " << trans.y<<" "  << trans.z << endl;
+			transformation->translationList.push_back(trans);
+		
+		translation = translation->NextSiblingElement("Translation");
+	}
+	XMLElement* scaling = pElement->FirstChildElement("Scaling");
+	while (scaling != nullptr)
+	{
+		int id;
+		eResult = scaling->QueryIntAttribute("id", &id);
 
+		
+			vec3 trans;
+			str = scaling->GetText();
+			sscanf(str, "%f %f %f", &trans.x,
+				&trans.y, &trans.z);
+			cout << trans.x << " " << trans.y << " " << trans.z << endl;
+			transformation->scalingList.push_back(trans);
+		
+
+
+			scaling = scaling->NextSiblingElement("Scaling");
+	}
+	XMLElement* rotation = pElement->FirstChildElement("Rotation");
+	while (rotation != nullptr)
+	{
+		int id;
+		eResult = rotation->QueryIntAttribute("id", &id);
+
+
+		vec4 trans;
+		str = rotation->GetText();
+		sscanf(str, "%f %f %f %f", &trans.x,
+			&trans.y, &trans.z,&trans.w);
+		cout << trans.x << " " << trans.y << " " << trans.z << " " << trans.w << endl;
+		transformation->rotationList.push_back(trans);
+
+
+
+		rotation = rotation->NextSiblingElement("Rotation");
+	}
+
+
+	
 	// Parse vertex data
 	pElement = pRoot->FirstChildElement("VertexData");
 	int cursor = 0;
@@ -551,6 +605,7 @@ void Scene::readXML(const char* xmlPath)
 
 Scene::Scene(const char* xmlPath)
 {
+	transformation = new Transformation();
 	readXML(xmlPath);
 	cout << "xml readed" << endl;
 	initObjects();
