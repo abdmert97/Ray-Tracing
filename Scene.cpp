@@ -28,23 +28,27 @@ void Scene::threading(Camera* camera, Image* image)
 	std::thread tda(&Scene::renderImagePart, this, (float)46/64,(float)53/64, camera, image);
 	std::thread tdb(&Scene::renderImagePart, this, (float)53/64,(float)64/64, camera, image);
 	td0.join();
-	//cout << "part1 rendered" << endl;
+	
 	td1.join();
-	//cout << "part2 rendered" << endl;
+
 	td2.join();
-	//cout << "part3 rendered" << endl;
+	
 	td3.join();
-	//cout << "part4 rendered" << endl;
+	
 	td4.join();
-	//cout << "part5 rendered" << endl;
+
 	td5.join();
-	//cout << "part6 rendered" << endl;
+	
 	td6.join();
-	//cout << "part7 rendered" << endl;
+	
 	td7.join();
+	
 	td8.join();
+
 	td9.join();
+
 	tda.join();
+
 	tdb.join();
 	
 	//cout << "part8 rendered" << endl;
@@ -126,7 +130,7 @@ void Scene::renderImagePart(float start,float end, Camera* camera, Image* image)
 			{
 				
 				Ray ray = camera->getPrimaryRay(w, h);
-				
+			
 				// Selecting Closest object to the camera
 				closestObjectReturnVal = rayIntersection->closestObject(ray);
 				if (closestObjectReturnVal.isIntersect == false) // ray hits nothing
@@ -360,56 +364,60 @@ void Scene::readXML(const char* xmlPath)
 	}
 	// Parse transformations
 	pElement = pRoot->FirstChildElement("Transformations");
-	XMLElement* translation = pElement->FirstChildElement("Translation");
-	while (translation != nullptr)
+	if(pElement != nullptr)
 	{
-		int id;
-		eResult = translation->QueryIntAttribute("id",&id);
+		XMLElement* translation = pElement->FirstChildElement("Translation");
+		while (translation != nullptr)
+		{
+			int id;
+			eResult = translation->QueryIntAttribute("id", &id);
 			vec3 trans;
 			str = translation->GetText();
 			sscanf(str, "%f %f %f", &trans.x,
 				&trans.y, &trans.z);
-			cout << trans.x <<  " " << trans.y<<" "  << trans.z << endl;
+			//cout << trans.x << " " << trans.y << " " << trans.z << endl;
 			transformation->translationList.push_back(trans);
-		
-		translation = translation->NextSiblingElement("Translation");
-	}
-	XMLElement* scaling = pElement->FirstChildElement("Scaling");
-	while (scaling != nullptr)
-	{
-		int id;
-		eResult = scaling->QueryIntAttribute("id", &id);
 
-		
+			translation = translation->NextSiblingElement("Translation");
+		}
+		XMLElement* scaling = pElement->FirstChildElement("Scaling");
+		while (scaling != nullptr)
+		{
+			int id;
+			eResult = scaling->QueryIntAttribute("id", &id);
+
+
 			vec3 trans;
 			str = scaling->GetText();
 			sscanf(str, "%f %f %f", &trans.x,
 				&trans.y, &trans.z);
 			cout << trans.x << " " << trans.y << " " << trans.z << endl;
 			transformation->scalingList.push_back(trans);
-		
+
 
 
 			scaling = scaling->NextSiblingElement("Scaling");
+		}
+		XMLElement* rotation = pElement->FirstChildElement("Rotation");
+		while (rotation != nullptr)
+		{
+			int id;
+			eResult = rotation->QueryIntAttribute("id", &id);
+
+
+			vec4 trans;
+			str = rotation->GetText();
+			sscanf(str, "%f %f %f %f", &trans.x,
+				&trans.y, &trans.z, &trans.w);
+			//cout << trans.x << " " << trans.y << " " << trans.z << " " << trans.w << endl;
+			transformation->rotationList.push_back(trans);
+
+
+
+			rotation = rotation->NextSiblingElement("Rotation");
+		}
 	}
-	XMLElement* rotation = pElement->FirstChildElement("Rotation");
-	while (rotation != nullptr)
-	{
-		int id;
-		eResult = rotation->QueryIntAttribute("id", &id);
-
-
-		vec4 trans;
-		str = rotation->GetText();
-		sscanf(str, "%f %f %f %f", &trans.x,
-			&trans.y, &trans.z,&trans.w);
-		cout << trans.x << " " << trans.y << " " << trans.z << " " << trans.w << endl;
-		transformation->rotationList.push_back(trans);
-
-
-
-		rotation = rotation->NextSiblingElement("Rotation");
-	}
+	
 
 
 	
@@ -482,7 +490,7 @@ void Scene::readXML(const char* xmlPath)
 
 				while (str[cursor] == ' ' || str[cursor] == '\t' || str[cursor] == '\n')
 					cursor++;
-				cout << transform.first << " first " << transform.second << endl;
+				//cout << transform.first << " first " << transform.second << endl;
 				transformList.push_back(transform);
 			}
 		}
@@ -493,13 +501,16 @@ void Scene::readXML(const char* xmlPath)
 		const char* type = objElement->Attribute("plyFile");
 		if (type != nullptr && type[0] == 'p')
 		{
-			cout << type << endl;
 			
-			happly::PLYData plyIn("hw2/ply/dragon_remeshed.ply");
+			//cout << type << endl;
+			const string filePath = "hw3/" + (string)type;
+
+			happly::PLYData plyIn(filePath);
 			int currID = vertices.size();
 			std::vector<std::array<double, 3>> vPos = plyIn.getVertexPositions();
 			std::vector<std::vector<int>> fInd = plyIn.getFaceIndices<int>();
 			Material* material = materials[matIndex - 1];
+
 			for (std::array<double, 3> vertex : vPos)
 			{
 				vertices.push_back(Vector3f{ (float)vertex[0], (float)vertex[1], (float)vertex[2] });
@@ -517,9 +528,7 @@ void Scene::readXML(const char* xmlPath)
 				meshIndices->push_back(p3Index);
 			}
 			objects.push_back(new Mesh(idCount++, matIndex - 1, material, faces, meshIndices, &vertices, MeshType, transformList));
-		
-			
-			
+
 		}
 		else
 		{
@@ -720,5 +729,7 @@ void Scene::initObjects()
 
 	
 	rayIntersection->boundingVolume = boundingVolume;
+	transformation->initMatrices();
+	
 }
 

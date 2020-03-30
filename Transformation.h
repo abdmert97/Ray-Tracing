@@ -16,9 +16,16 @@ class Transformation
 		vector<vec3> translationList;
 		vector<vec3> scalingList;
 		vector<vec4> rotationList;
+		vector<mat4x4 *> translationMatrices;
+		vector<mat4x4 *> scalingMatrices;
+		vector<mat4x4 *> rotationMatrices;
 		vec4 translation(int id,vec3 position);
 		vec4 scaling(int id,vec3 scale);
 		vec4 rotation(int id,vec4 rotationList);
+		vec4 inverseTranslation(int id, glm::vec3 position);
+
+		void initMatrices();
+	
 		vec4 multiplyMatrixWithVec4(mat4x4 m, vec4 v)
 		{
 			double values[4];
