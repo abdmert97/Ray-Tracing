@@ -1,7 +1,11 @@
 #include "BoundingVolume.h"
 #include <ctime>
 
-
+using namespace glm;
+bool  compareVec3(const std::pair<glm::vec3, int>& lhs, const std::pair<glm::vec3, int>& rhs)
+{
+	return lhs.first.x < rhs.first.x;
+}
 void BoundingVolume::build(Node* node)
 {
 	int size = node->ObjectIDs.size();
@@ -14,14 +18,14 @@ void BoundingVolume::build(Node* node)
 		node->boundingBox.extend(bounds);
 	}
 	if (size <= 1) return;
-	vector<std::pair<Vector3f, int>> midpoints;
+	vector<std::pair<vec3, int>> midpoints;
 	for (int i = 0; i < size; i++)
 	{
 		Shape* shape = (*objects)[node->ObjectIDs[i]];
 		BoundingBox* bounds = shape->getBounds();
 		midpoints.emplace_back(bounds->midPoint(), node->ObjectIDs[i]);
 	}
-	std::sort(midpoints.begin(), midpoints.end());
+	std::sort(midpoints.begin(), midpoints.end(),compareVec3);
 
 	
 	node->left = new Node;
@@ -49,14 +53,15 @@ void BoundingVolume::buildMeshVolume(Node* node)
 		node->boundingBox.extend(bounds);
 	}
 	if (size <= 1) return;
-	vector<std::pair<Vector3f,int>> midpoints;
+	vector<std::pair<glm::vec3,int>> midpoints;
 	for (int i = 0; i < size; i++)
 	{
 		Triangle shape = (*triangles)[node->ObjectIDs[i]];
 		BoundingBox* bounds = shape.getBounds();
 		midpoints.emplace_back(bounds->midPoint(), node->ObjectIDs[i]);
 	}
-	std::sort(midpoints.begin(), midpoints.end());
+
+	std::sort(midpoints.begin(), midpoints.end(),compareVec3);
 
 
 	node->left = new Node;
@@ -74,10 +79,11 @@ void BoundingVolume::buildMeshVolume(Node* node)
 	buildMeshVolume(node->left);
 	buildMeshVolume(node->right);
 }
-bool BoundingVolume::isInLeft(const Vector3f& midPoint, BoundingBox* bounding_box)
+bool BoundingVolume::isInLeft(const glm::vec3& midPoint, BoundingBox* bounding_box)
 {
 	if (midPoint.x > (bounding_box->min.x + bounding_box->max.x) / 2)
 		return true;
 	return false;
 }
+
 

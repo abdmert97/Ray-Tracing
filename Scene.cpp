@@ -103,13 +103,13 @@ void Scene::renderImage(Camera* camera, Image* image)
 				// start Shading a object
 
 				shape = objects[closestObjectReturnVal.objectID];
-				Color shadingColor = shading->shading(maxRecursionDepth, shape, closestObjectReturnVal, ray);
+				vec3 shadingColor = shading->shading(maxRecursionDepth, shape, closestObjectReturnVal, ray);
 				//  cout<<(int)color.red<< " "<<(int)color.grn<< " "<<(int)color.blu<< " "<<endl;
-				shadingColor.red = shadingColor.red > 255 ? 255 : shadingColor.red;
-				shadingColor.grn = shadingColor.grn > 255 ? 255 : shadingColor.grn;
-				shadingColor.blu = shadingColor.blu > 255 ? 255 : shadingColor.blu;
-				
-				image->setPixelValue(w, h, shadingColor);
+				shadingColor.x = shadingColor.x > 255 ? 255 : shadingColor.x;
+				shadingColor.y = shadingColor.y > 255 ? 255 : shadingColor.y;
+				shadingColor.z = shadingColor.z > 255 ? 255 : shadingColor.z;
+				Color lastColor = Color{ (unsigned int)shadingColor.x,(unsigned int)shadingColor.y,(unsigned int)shadingColor.z };
+				image->setPixelValue(w, h, lastColor);
 			}
 		}
 	}
@@ -143,10 +143,13 @@ void Scene::renderImagePart(float start,float end, Camera* camera, Image* image)
 				{
 					// start Shading a object
 					shape = objects[closestObjectReturnVal.objectID];
-					Color color = shading->shading(maxRecursionDepth, shape, closestObjectReturnVal, ray);
-
-					//  cout<<(int)color.red<< " "<<(int)color.grn<< " "<<(int)color.blu<< " "<<endl;
-					image->setPixelValue(w, h, color);
+					vec3 shadingColor = shading->shading(maxRecursionDepth, shape, closestObjectReturnVal, ray);
+					shadingColor.x = shadingColor.x > 255 ? 255 : shadingColor.x;
+					shadingColor.y = shadingColor.y > 255 ? 255 : shadingColor.y;
+					shadingColor.z = shadingColor.z > 255 ? 255 : shadingColor.z;
+					Color lastColor = Color{ (unsigned int)shadingColor.x,(unsigned int)shadingColor.y,(unsigned int)shadingColor.z };
+				
+					image->setPixelValue(w, h, lastColor);
 				}
 				
 				
@@ -222,7 +225,7 @@ void Scene::readXML(const char* xmlPath)
 	{
 		int id;
 		char imageName[64];
-		Vector3f pos, gaze, up;
+		glm::vec3 pos, gaze, up;
 		ImagePlane imgPlane;
 
 		eResult = pCamera->QueryIntAttribute("id", &id);
@@ -236,7 +239,7 @@ void Scene::readXML(const char* xmlPath)
 
 			camElement = pCamera->FirstChildElement("GazePoint");
 			str = camElement->GetText();
-			Vector3f gazePoint;
+			glm::vec3 gazePoint;
 			sscanf(str, "%f %f %f", &gazePoint.x, &gazePoint.y, &gazePoint.z);
 
 			camElement = pCamera->FirstChildElement("Up");
@@ -259,9 +262,9 @@ void Scene::readXML(const char* xmlPath)
 			strcpy(imageName, str);
 
 			
-			Vector3f forward = (pos - gazePoint).normalizeVector();
-			Vector3f left = up.normalizeVector() * forward;
-			Vector3f newUp = (forward * left).normalizeVector();
+			glm::vec3 forward = normalize(pos - gazePoint);
+			glm::vec3 left = cross(normalize(up)  ,forward);
+			glm::vec3 newUp = normalize(cross(forward , left));
 			
 			float height = imgPlane.distance * tan(fovY * 0.0174532925 * 0.5f);
 			float r = (float)imgPlane.nx / imgPlane.ny;
@@ -270,7 +273,7 @@ void Scene::readXML(const char* xmlPath)
 			imgPlane.right = 1* r*height;
 			imgPlane.bottom = -1* height;
 			imgPlane.top =  1 * height;
-			cameras.push_back(new Camera(id, imageName, pos, forward*-1, newUp, imgPlane));
+			cameras.push_back(new Camera(id, imageName, pos, forward*vec3(-1), newUp, imgPlane));
 		}
 		else
 		{
@@ -424,7 +427,7 @@ void Scene::readXML(const char* xmlPath)
 	// Parse vertex data
 	pElement = pRoot->FirstChildElement("VertexData");
 	int cursor = 0;
-	Vector3f tmpPoint;
+	glm::vec3 tmpPoint;
 	str = pElement->GetText();
 	while (str[cursor] == ' ' || str[cursor] == '\t' || str[cursor] == '\n')
 		cursor++;
@@ -513,7 +516,7 @@ void Scene::readXML(const char* xmlPath)
 
 			for (std::array<double, 3> vertex : vPos)
 			{
-				vertices.push_back(Vector3f{ (float)vertex[0], (float)vertex[1], (float)vertex[2] });
+				vertices.push_back(glm::vec3{ (float)vertex[0], (float)vertex[1], (float)vertex[2] });
 				
 			}
 			for (std::vector<int> vertex : fInd)
@@ -663,8 +666,8 @@ void Scene::readXML(const char* xmlPath)
 
 	// Parse lights
 	int id;
-	Vector3f position;
-	Vector3f intensity;
+	glm::vec3 position;
+	glm::vec3 intensity;
 	pElement = pRoot->FirstChildElement("Lights");
 
 	XMLElement* pLight = pElement->FirstChildElement("AmbientLight");
@@ -702,13 +705,13 @@ void Scene::setScene()
 {
 	lightCount = lights.size();
 	objectCount = objects.size();
-	ambientLightList = new Color[materials.size()];
+	ambientLightList = new vec3[materials.size()];
 	for (int i = 0; i < materials.size(); i++)
 	{
 		Material mat = *materials[i];
-		ambientLightList[i].red = (unsigned int)(mat.ambientRef.x * ambientLight.x);
-		ambientLightList[i].grn = (unsigned int)(mat.ambientRef.y * ambientLight.y);
-		ambientLightList[i].blu = (unsigned int)(mat.ambientRef.z * ambientLight.z);
+		ambientLightList[i].x = (unsigned int)(mat.ambientRef.x * ambientLight.x);
+		ambientLightList[i].y = (unsigned int)(mat.ambientRef.y * ambientLight.y);
+		ambientLightList[i].z = (unsigned int)(mat.ambientRef.z * ambientLight.z);
 	}
 	cameraCount = cameras.size();
 }

@@ -20,7 +20,7 @@ private:
 	
 	float shadowRayEps;
 	vector<Material*> materials;
-	Color* ambientLightList;
+	glm::vec3* ambientLightList;
 	int lightCount;
 	int objectCount;
 	vector<PointLight*> lights;
@@ -29,7 +29,7 @@ public:
 	Reflection* reflection;
 	RayIntersection* rayIntersection;
 	Refraction* refraction;
-	Shading( float shadow_ray_eps, const vector<Material*>& materials, Color* ambient_light_list,
+	Shading( float shadow_ray_eps, const vector<Material*>& materials, glm::vec3* ambient_light_list,
 		int light_count, int object_count, const vector<PointLight*>& point_lights,vector<Shape*>* objects)
 		: 
 		  shadowRayEps(shadow_ray_eps),
@@ -43,14 +43,14 @@ public:
 	}
 
 private:
-	bool isShadow(Vector3f& lightPosition, Vector3f& intersectionPoint)const;
-	void calculateColor(IntersectionInfo& closestObjectInfo, Material material, PointLight* light, Vector3f lightVector,
-	Vector3f cameraVectorNormalized, Vector3f& shaders) const;
-	Vector3f blinnPhongShading(Vector3f lightRayVector, Vector3f& cameraRayVector, Material& material,
-	Vector3f& lightIntensity, Vector3f& normal) const;
-	Vector3f diffuseShading(Vector3f lightRayVector, Material& material, Vector3f& lightIntensity, Vector3f& normal)const;
+	bool isShadow(glm::vec3& lightPosition, glm::vec3& intersectionPoint)const;
+	void calculateColor(IntersectionInfo& closestObjectInfo, Material material, PointLight* light, glm::vec3 lightVector,
+	glm::vec3 cameraVectorNormalized, glm::vec3& shaders) const;
+	glm::vec3 blinnPhongShading(glm::vec3 lightRayVector, glm::vec3& cameraRayVector, Material& material,
+	glm::vec3& lightIntensity, glm::vec3& normal) const;
+	glm::vec3 diffuseShading(glm::vec3 lightRayVector, Material& material, glm::vec3& lightIntensity, glm::vec3& normal)const;
 public:
-	Color shading(int depth, Shape*& shape, IntersectionInfo& closestObjectInfo, Ray& ray, float n_t =1);
+	glm::vec3 shading(int depth, Shape*& shape, IntersectionInfo& closestObjectInfo, Ray& ray, float n_t =1);
 	
 };
 

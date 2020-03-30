@@ -2,6 +2,8 @@
 #define _MATERIAL_H_
 
 #include "defs.h"
+#include "RayTracing/glm/vec3.hpp"
+
 enum MaterialType
 {
 	Default,
@@ -16,11 +18,11 @@ public:
 	int id;	// Material id
 	MaterialType materialType;
 	int phongExp;	// Phong exponent
-	Vector3f ambientRef;	// Coefficients for ambient reflection
-	Vector3f diffuseRef;	// Coefficients for diffuse reflection
-	Vector3f specularRef;	// Coefficients for specular reflection
-	Vector3f mirrorRef;		// Coefficients for mirror reflection
-	Vector3f absorptionCoefficient;
+	glm::vec3 ambientRef;	// Coefficients for ambient reflection
+	glm::vec3 diffuseRef;	// Coefficients for diffuse reflection
+	glm::vec3 specularRef;	// Coefficients for specular reflection
+	glm::vec3 mirrorRef;		// Coefficients for mirror reflection
+	glm::vec3 absorptionCoefficient;
 	float absorptionIndex;
 	float refractionIndex;
 	Material(void);	// Constructor

@@ -22,7 +22,7 @@ Sphere::Sphere(void)
 {}
 
 /* Constructor for sphere. You will implement this. */
-Sphere::Sphere(int id, int matIndex, Material* material, int cIndex, float R, vector<Vector3f> *pVertices, ShapeType type, vector<std::pair<char, int>> transformations)
+Sphere::Sphere(int id, int matIndex, Material* material, int cIndex, float R, vector<glm::vec3> *pVertices, ShapeType type, vector<std::pair<char, int>> transformations)
     : Shape(id, matIndex,material,type,transformations)
 {
 this->radius = R;
@@ -37,15 +37,15 @@ IntersectionInfo Sphere::intersect(const Ray & ray) const
 {
     IntersectionInfo returnValue = {};
     returnValue.isIntersect = false;
-    Vector3f direction = ray.direction;
-    Vector3f origin = ray.origin;
-    Vector3f center = this->center;
-
-    float t = (direction*-1).dotProduct(origin-center);
+    glm::vec3 direction = ray.direction;
+    glm::vec3 origin = ray.origin;
+    glm::vec3 center = this->center;
+	
+    float t =  dot(direction*vec3(-1),(origin-center));
     //dummy variables
-    float x =  direction.dotProduct(origin-center);
-    float y =  direction.dotProduct(direction);
-    float z =  (origin-center).dotProduct(origin-center);
+    float x =  glm::dot(direction,(origin-center));
+	float y = dot(direction, direction);
+    float z =  dot((origin-center),(origin-center));
     float delta = x*x-y*(z-radius*radius);
 
     if(delta < 0 || t + sqrt(delta) <= 0)
@@ -72,7 +72,7 @@ BoundingBox* Sphere::getBounds()
 	if(bounds == nullptr)
 	{
 		bounds = new BoundingBox();
-		Vector3f radiusVec = { radius,radius,radius };
+		glm::vec3 radiusVec = { radius,radius,radius };
 		bounds->min = center - radiusVec;
 		bounds->max = center + radiusVec;
 	}
@@ -108,7 +108,7 @@ Triangle::Triangle(void)
 {}
 
 /* Constructor for triangle. You will implement this. */
-Triangle::Triangle(int id, int matIndex, Material* material, int p1Index, int p2Index, int p3Index, vector<Vector3f> *pVertices, ShapeType type, vector<std::pair<char, int>> transformations)
+Triangle::Triangle(int id, int matIndex, Material* material, int p1Index, int p2Index, int p3Index, vector<glm::vec3> *pVertices, ShapeType type, vector<std::pair<char, int>> transformations)
     : Shape(id, matIndex,material,type,transformations)
 {
     point1 = pVertices[0][p1Index-1];
@@ -125,8 +125,8 @@ IntersectionInfo Triangle::intersect(const Ray & ray) const
     IntersectionInfo returnValue ={};
     returnValue.isIntersect = false;
 	returnValue.objectID = -1;
-    Vector3f rayDirection = ray.direction;
-    Vector3f rayOrigin = ray.origin;
+    glm::vec3 rayDirection = ray.direction;
+    glm::vec3 rayOrigin = ray.origin;
     float AMatrix[3][3] = {
 
             {point1.x-point2.x, point1.x-point3.x, rayDirection.x},
@@ -171,8 +171,8 @@ IntersectionInfo Triangle::intersect(const Ray & ray) const
         returnValue.isIntersect = true;
         returnValue.t = t;
         returnValue.intersectionPoint = ray.getPoint(t);
-		Vector3f crossProduct = (point2 - point1) * (point3 - point1);
-		returnValue.hitNormal = crossProduct.normalizeVector();
+		glm::vec3 crossProduct = (point2 - point1) * (point3 - point1);
+		returnValue.hitNormal =glm::normalize(crossProduct);
     }
 
     return returnValue;
@@ -182,7 +182,7 @@ Mesh::Mesh()
 {}
 
 /* Constructor for mesh. You will implement this. */
-Mesh::Mesh(int id, int matIndex, Material* material, const vector<Triangle>& faces, vector<int> *pIndices, vector<Vector3f> *pVertices, ShapeType type, vector<std::pair<char, int>> transformations)
+Mesh::Mesh(int id, int matIndex, Material* material, const vector<Triangle>& faces, vector<int> *pIndices, vector<glm::vec3> *pVertices, ShapeType type, vector<std::pair<char, int>> transformations)
     : Shape(id, matIndex,material,type,transformations),faces(faces)
 {
 	for (Triangle triangle : faces)

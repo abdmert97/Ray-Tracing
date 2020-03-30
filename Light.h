@@ -9,14 +9,14 @@ using namespace std;
 class PointLight
 {
 public:	
-    Vector3f position;	// Position of the point light
+	glm::vec3 position;	// Position of the point light
 
-    PointLight(const Vector3f & position, const Vector3f & intensity);	// Constructor
-    Vector3f computeLightContribution(const Vector3f& p); // Compute the contribution of light at point p
+    PointLight(const glm::vec3& position, const glm::vec3& intensity);	// Constructor
+	glm::vec3 computeLightContribution(const glm::vec3& p); // Compute the contribution of light at point p
 
 private:
 
-    Vector3f intensity;	// Intensity of the point light
+	glm::vec3 intensity;	// Intensity of the point light
 };
 
 

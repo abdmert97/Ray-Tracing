@@ -5,6 +5,7 @@
 #include <cstdlib>
 
 #include "defs.h"
+#include "RayTracing/glm/vec3.hpp"
 
 //
 // Access the color using either individual component names
@@ -25,7 +26,7 @@ typedef union Color
 						blu + c.blu };
 		return retVal;
 	}
-	Color operator+(Vector3f colorVector)
+	Color operator+(glm::vec3 colorVector)
 	{
 		Color color = { red,grn,blu };
 			color.red += (unsigned int)colorVector.x;

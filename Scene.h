@@ -36,13 +36,13 @@ public:
 	static int maxRecursionDepth;			// Maximum recursion depth
 	float intTestEps;				// IntersectionTestEpsilon. You will need this one while implementing intersect routines in Shape class
 	float shadowRayEps;				// ShadowRayEpsilon. You will need this one while generating shadow rays.
-	Vector3f backgroundColor;		// Background color
-	Vector3f ambientLight;			// Ambient light radiance
+	glm::vec3 backgroundColor;		// Background color
+	glm::vec3 ambientLight;			// Ambient light radiance
 
 	vector<Camera *> cameras;		// Vector holding all cameras
 	vector<PointLight *> lights;	// Vector holding all point lights
 	vector<Material *> materials;	// Vector holding all materials
-	vector<Vector3f> vertices;		// Vector holding all vertices (vertex data)
+	vector<glm::vec3> vertices;		// Vector holding all vertices (vertex data)
 	vector<Shape *> objects;		// Vector holding all shapes
 
 	Shading* shading;
@@ -74,7 +74,7 @@ private:
 	int cameraCount;
 	int lightCount;
 	int objectCount;
-	Color* ambientLightList;
+	vec3* ambientLightList;
 };
 
 #endif

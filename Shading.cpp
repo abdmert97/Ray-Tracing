@@ -3,28 +3,28 @@
 #include "Scene.h"
 
 
-Color Shading::shading(int depth, Shape*& shape, IntersectionInfo& closestObjectInfo, Ray& ray,float n_t)
+vec3 Shading::shading(int depth, Shape*& shape, IntersectionInfo& closestObjectInfo, Ray& ray,float n_t)
 {
 	// If depth is less then zero stop shading
 	if (depth < 0)
 	{
-		Color color = { 0,0,0 };
+		vec3 color = { 0,0,0 };
 		return color;
 	}
 	
 	Material material = *materials[shape->matIndex];
 
-	bool isInside = ray.direction.dotProduct(closestObjectInfo.hitNormal) > 0;
+	bool isInside = dot(ray.direction,closestObjectInfo.hitNormal) > 0;
 	
-	Color color = { 0,0,0 };
-	Vector3f cameraVectorNormalized = (ray.origin - closestObjectInfo.intersectionPoint).normalizeVector();
+	vec3 color = { 0,0,0 };
+	glm::vec3 cameraVectorNormalized = normalize(ray.origin - closestObjectInfo.intersectionPoint);
 	
 	if(!isInside)
 	{
 		color = ambientLightList[shape->matIndex];
 
 		PointLight* light;
-		Vector3f lightVector;
+		glm::vec3 lightVector;
 		
 		for (int l = 0; l < lightCount; l++)
 		{
@@ -37,7 +37,7 @@ Color Shading::shading(int depth, Shape*& shape, IntersectionInfo& closestObject
 				continue;
 			}
 			// Shading
-			Vector3f shaders;
+			glm::vec3 shaders;
 			
 			calculateColor(closestObjectInfo, material, light, lightVector, cameraVectorNormalized, shaders);
 			color = color + shaders;
@@ -55,12 +55,12 @@ Color Shading::shading(int depth, Shape*& shape, IntersectionInfo& closestObject
 		refraction->refraction(depth, ray, closestObjectInfo, material, color,ray.direction,n_t);
 	return color;
 }
-bool Shading::isShadow(Vector3f& lightPosition, Vector3f& intersectionPoint)const
+bool Shading::isShadow(glm::vec3& lightPosition, glm::vec3& intersectionPoint)const
 {
-	Vector3f lightVector = lightPosition - intersectionPoint;
+	glm::vec3 lightVector = lightPosition - intersectionPoint;
 	
-	Ray shadowRay = Ray((intersectionPoint + lightVector.normalizeVector() * shadowRayEps), lightVector.normalizeVector());
-	Ray shadowRay_ = Ray(intersectionPoint, lightVector.normalizeVector());
+	Ray shadowRay = Ray((intersectionPoint + normalize(lightVector) * shadowRayEps), normalize(lightVector));
+	Ray shadowRay_ = Ray(intersectionPoint, normalize(lightVector));
 	float tFromIntersectionToLight = shadowRay_.gett(lightPosition);
 	IntersectionInfo returnVal = rayIntersection->closestObject(shadowRay);
 	Shape* shadowShape;
@@ -83,35 +83,35 @@ bool Shading::isShadow(Vector3f& lightPosition, Vector3f& intersectionPoint)cons
 
 	return false;
 }
-void Shading::calculateColor(IntersectionInfo& closestObjectInfo, Material material, PointLight* light, Vector3f lightVector, Vector3f cameraVectorNormalized, Vector3f& shaders) const
+void Shading::calculateColor(IntersectionInfo& closestObjectInfo, Material material, PointLight* light, glm::vec3 lightVector, glm::vec3 cameraVectorNormalized, glm::vec3& shaders) const
 {
-	Vector3f lightVectorNormalized = lightVector.normalizeVector();
-	Vector3f intensity = light->computeLightContribution(closestObjectInfo.intersectionPoint);
+	glm::vec3 lightVectorNormalized = normalize(lightVector);
+	glm::vec3 intensity = light->computeLightContribution(closestObjectInfo.intersectionPoint);
 	shaders = { 0,0,0 };
-	Vector3f blinnPhongShade = blinnPhongShading(lightVectorNormalized, cameraVectorNormalized, material, intensity, closestObjectInfo.hitNormal);
-	Vector3f diffuseShade = diffuseShading(lightVectorNormalized, material, intensity, closestObjectInfo.hitNormal);
+	glm::vec3 blinnPhongShade = blinnPhongShading(lightVectorNormalized, cameraVectorNormalized, material, intensity, closestObjectInfo.hitNormal);
+	glm::vec3 diffuseShade = diffuseShading(lightVectorNormalized, material, intensity, closestObjectInfo.hitNormal);
 	shaders = diffuseShade + blinnPhongShade;
 }
-Vector3f Shading::blinnPhongShading(Vector3f lightRayVector, Vector3f& cameraRayVector, Material& material, Vector3f& lightIntensity, Vector3f& normal)const
+glm::vec3 Shading::blinnPhongShading(glm::vec3 lightRayVector, glm::vec3& cameraRayVector, Material& material, glm::vec3& lightIntensity, glm::vec3& normal)const
 {
-	Vector3f halfVector = (lightRayVector + cameraRayVector).normalizeVector();
+	glm::vec3 halfVector = normalize(lightRayVector + cameraRayVector);
 
-	float cosAlpha = halfVector.dotProduct(normal);
+	float cosAlpha = dot( halfVector,normal);
 
 	if (cosAlpha < 0) cosAlpha = 0;
 
-	Vector3f blinnPhongLight = material.specularRef.scalarProduct(lightIntensity) * pow(cosAlpha, material.phongExp);
+	glm::vec3 blinnPhongLight = material.specularRef*vec3(lightIntensity) * pow(cosAlpha, material.phongExp);
 
 	return blinnPhongLight;
 
 }
-Vector3f Shading::diffuseShading(Vector3f lightRayVector, Material& material, Vector3f& lightIntensity, Vector3f& normal)const
+glm::vec3 Shading::diffuseShading(glm::vec3 lightRayVector, Material& material, glm::vec3& lightIntensity, glm::vec3& normal)const
 {
 
-	float cosTheta = lightRayVector.dotProduct(normal);
+	float cosTheta = dot(lightRayVector,normal);
 	if (cosTheta < 0) cosTheta = 0;
 
-	Vector3f diffuse = material.diffuseRef.scalarProduct(lightIntensity) * cosTheta;
+	glm::vec3 diffuse = material.diffuseRef*vec3(lightIntensity) * cosTheta;
 
 	return diffuse;
 

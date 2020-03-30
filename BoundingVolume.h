@@ -13,6 +13,7 @@ class BoundingVolume
 private:
 	vector<Shape*> *objects;
 	vector<Triangle> *triangles;
+
 public:
 	Node* root;
 	int level=0;
@@ -36,13 +37,14 @@ public:
 		buildMeshVolume(root);
 
 	}
-	bool isInLeft(const Vector3f& midPoint, BoundingBox* bounding_box);
-	bool sortVector(const std::pair<int, Vector3f>& v1, const std::pair<int, Vector3f>& v2);
+	bool isInLeft(const glm::vec3& midPoint, BoundingBox* bounding_box);
+	bool sortVector(const std::pair<int, glm::vec3>& v1, const std::pair<int, glm::vec3>& v2);
 
 
 
 	void build(Node* node);
 	void buildMeshVolume(Node* node);
+
 };
 
 

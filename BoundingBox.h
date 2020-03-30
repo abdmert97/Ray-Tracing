@@ -10,8 +10,8 @@ class BoundingBox
 {
 
 public:
-	Vector3f min;
-	Vector3f max;
+	glm::vec3 min;
+	glm::vec3 max;
 	BoundingBox()
 	{
 		min = { INT16_MAX,INT16_MAX ,INT16_MAX };
@@ -32,11 +32,11 @@ public:
 	}*/
 	void extend(BoundingBox *boundingBox);
 	void extend(Shape * shape);
-	static Vector3f getMin(Vector3f v1, Vector3f v2);
-	static Vector3f getMax(Vector3f v1, Vector3f v2);
+	static glm::vec3 getMin(glm::vec3 v1, glm::vec3 v2);
+	static glm::vec3 getMax(glm::vec3 v1, glm::vec3 v2);
 	float isIntersect(Ray ray);
 	void printBounds();
-	Vector3f midPoint();
+	glm::vec3 midPoint();
 };
 #endif
 

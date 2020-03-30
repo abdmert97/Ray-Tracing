@@ -13,17 +13,17 @@ void BoundingBox::extend(Shape* shape)
 	max = getMax(max, boundingBox->max);
 }
 
-Vector3f  BoundingBox::getMin(Vector3f v1, Vector3f v2)
+glm::vec3  BoundingBox::getMin(glm::vec3 v1, glm::vec3 v2)
 {
-	return Vector3f{
+	return glm::vec3{
 		{v1.x < v2.x ? v1.x : v2.x},
 		{v1.y < v2.y ? v1.y : v2.y},
 		{v1.z < v2.z ? v1.z : v2.z}
 	};
 }
-Vector3f BoundingBox::getMax(Vector3f v1, Vector3f v2)
+glm::vec3 BoundingBox::getMax(glm::vec3 v1, glm::vec3 v2)
 {
-	return Vector3f{
+	return glm::vec3{
 		{v1.x < v2.x ? v2.x : v1.x},
 		{v1 .y < v2.y ? v2.y : v1.y},
 		{v1.z < v2.z ? v2.z : v1.z}
@@ -92,13 +92,14 @@ float BoundingBox::isIntersect(Ray r)
 
 void BoundingBox::printBounds()
 {
-	cout << "min: " << min << endl;
-	cout << "max: " << max << endl;
+	//cout << "min: " << min << endl;
+	//cout << "max: " << max << endl;
 }
 
-Vector3f BoundingBox::midPoint()
+glm::vec3 BoundingBox::midPoint()
 {
-	return (min + max) / 2;
+	glm::vec3 midp = glm::vec3(min.x / 2 + max.x / 2, min.y / 2 + max.y / 2, min.z / 2 + max.z / 2);
+	return midp;
 }
 
 

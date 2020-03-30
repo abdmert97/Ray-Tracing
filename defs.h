@@ -2,6 +2,7 @@
 #define _DEFS_H_
 #include <iostream>
 #include <cmath>
+#include "RayTracing/glm/vec3.hpp"
 
 class Scene;
 using namespace std;
@@ -14,116 +15,14 @@ Think about the variables you will need for this purpose and declare them here i
 Used for both coordinates and color.
 Use x, y, z for coordinate computations, and use r, g, b for color computations.
 Note that you do not have to use this one if you use any vector computation library like Eigen. */
-typedef struct Vector3f
-{
-	union
-	{
-		float x;
-		float r;
-	};
-	union
-	{
-		float y;
-		float g;
-	};
-	union
-	{
-		float z;
-		float b;
-	};
-	bool operator<(const Vector3f& a) const
-	{
-		return this->x < a.x;
-	}
-	 Vector3f operator=(Vector3f v2)
-    {
-        this->x = v2.x;
-        this->y = v2.y;
-        this->z = v2.z;
-        return *this;
-    }
-    float dotProduct(const Vector3f v1) const
-    {
-        return x*v1.x+y*v1.y+z*v1.z;
-    }
-     float length() const
-    {
-        return sqrt(x*x+y*y+z*z);
-    }
-    Vector3f normalizeVector()const
-    {
-
-        float magnitude = sqrt(x*x+y*y+z*z);
-        if(magnitude == 0)
-        {
-            Vector3f resultVector = {0,0,0}; 
-             return resultVector;
-        }
-        else
-        {
-            Vector3f resultVector = {x/magnitude , y / magnitude, z/magnitude};
-
-            return resultVector;
-        }
-
-    }
-     Vector3f scalarProduct(Vector3f v2)const
-     {
-         Vector3f result = {x*v2.x , y*v2.y , z*v2.z};
-         return result;
-
-     }
-
-
-} Vector3f;
-inline Vector3f operator+(Vector3f v1,Vector3f v2)
-    {
-        Vector3f resultVector{v1.x+v2.x,v1.y+v2.y,v1.z+v2.z};
-        return resultVector;
-    }
-
-inline Vector3f operator-(Vector3f v1,Vector3f v2)
-    {
-        Vector3f resultVector{v1.x-v2.x,v1.y-v2.y,v1.z-v2.z};
-        return resultVector;
-    }
-inline Vector3f operator*( Vector3f p, float f)
-{
-    Vector3f resultVector  ={f*p.x,f*p.y,f*p.z};
-
- return resultVector;
-}
-inline Vector3f operator*( Vector3f u, Vector3f v)
-{
-    Vector3f resultVector  ={u.y*v.z - u.z*v.y,
-                             u.z*v.x - u.x*v.z,
-                             u.x*v.y - u.y*v.x};
-
- return resultVector;
-}
-inline Vector3f operator/(Vector3f v1,Vector3f v2)
-    {
-        Vector3f resultVector{v1.x/v2.x,v1.y/v2.y,v1.z/v2.z};
-        return resultVector;
-    }
-inline Vector3f operator/(Vector3f v1,float f)
-{
-    Vector3f resultVector{v1.x/f,v1.y/f,v1.z/f};
-    return resultVector;
-}
-inline ostream& operator<<(ostream& os, const Vector3f v  )
-    {
-        return os<<"x: " << v.x << " y: "<< v.y << " z: "<<v.z<<endl;
-
-    }
 
 
 typedef struct IntersectionInfo
 {
     bool isIntersect;
-    Vector3f intersectionPoint;
+    glm::vec3 intersectionPoint;
     float t;
-    Vector3f hitNormal;
+    glm::vec3 hitNormal;
 	int objectID;
 
 	IntersectionInfo()

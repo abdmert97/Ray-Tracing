@@ -42,11 +42,11 @@ class Sphere: public Shape
 public:
 	
 	Sphere(void);	// Constructor
-	Sphere(int id, int matIndex, Material* material, int cIndex, float R, vector<Vector3f> *vertices,ShapeType type, vector<std::pair<char, int>> transformations);	// Constructor
+	Sphere(int id, int matIndex, Material* material, int cIndex, float R, vector<glm::vec3> *vertices,ShapeType type, vector<std::pair<char, int>> transformations);	// Constructor
 	IntersectionInfo intersect(const Ray & ray) const;	// Will take a ray and return a structure related to the intersection information. You will implement this.
 	BoundingBox* getBounds();
 private:
-	Vector3f center;
+	glm::vec3 center;
 	float radius;
 
 };
@@ -56,13 +56,13 @@ class Triangle: public Shape
 {
 public:
 	Triangle(void);	// Constructor
-	Triangle(int id, int matIndex, Material* material, int p1Index, int p2Index, int p3Index, vector<Vector3f> *vertices, ShapeType type, vector<std::pair<char, int>> transformations);	// Constructor
+	Triangle(int id, int matIndex, Material* material, int p1Index, int p2Index, int p3Index, vector<glm::vec3> *vertices, ShapeType type, vector<std::pair<char, int>> transformations);	// Constructor
 	IntersectionInfo intersect(const Ray & ray) const; // Will take a ray and return a structure related to the intersection information. You will implement this.
 	BoundingBox* getBounds();
 private:
-    Vector3f point1;
-    Vector3f point2;
-    Vector3f point3;
+    glm::vec3 point1;
+    glm::vec3 point2;
+    glm::vec3 point3;
 };
 
 // Class for mesh
@@ -71,7 +71,7 @@ class Mesh: public Shape
 public:
 	BoundingVolume* boundingVolume;
 	Mesh(void);	// Constructor
-	Mesh(int id, int matIndex, Material* material, const vector<Triangle>& faces, vector<int> *pIndices, vector<Vector3f> *vertices, ShapeType type, vector<std::pair<char, int>> transformations);	// Constructor
+	Mesh(int id, int matIndex, Material* material, const vector<Triangle>& faces, vector<int> *pIndices, vector<glm::vec3> *vertices, ShapeType type, vector<std::pair<char, int>> transformations);	// Constructor
 	void MeshVolumeIntersection(const Ray& ray, Node* node, IntersectionInfo* intersecion_info) const;
 	IntersectionInfo intersect(const Ray & ray) const; // Will take a ray and return a structure related to the intersection information. You will implement this.
 	BoundingBox* getBounds();

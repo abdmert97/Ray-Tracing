@@ -4,10 +4,10 @@ Material::Material(void)
 {
 	phongExp = 0;
 	
-	Vector3f ambientRef = {0,0,0};	// Coefficients for ambient reflection
-	Vector3f diffuseRef = { 0,0,0 };	// Coefficients for diffuse reflection
-	Vector3f specularRef = { 0,0,0 };	// Coefficients for specular reflection
-	Vector3f mirrorRef = { 0,0,0 };		// Coefficients for mirror reflection
+	glm::vec3 ambientRef = {0,0,0};	// Coefficients for ambient reflection
+	glm::vec3 diffuseRef = { 0,0,0 };	// Coefficients for diffuse reflection
+	glm::vec3 specularRef = { 0,0,0 };	// Coefficients for specular reflection
+	glm::vec3 mirrorRef = { 0,0,0 };		// Coefficients for mirror reflection
 	
 	refractionIndex = 1;
 }

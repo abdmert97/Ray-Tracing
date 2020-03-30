@@ -3,6 +3,7 @@
 
 #include "Ray.h"
 #include "defs.h"
+#include "RayTracing/glm/vec3.hpp"
 
 // Structure for holding variables related to the image plane
 typedef struct ImagePlane
@@ -25,22 +26,22 @@ public:
 
 	Camera(int id,                      // Id of the camera
            const char* imageName,       // Name of the output PPM file
-           const Vector3f& pos,         // Camera position
-           const Vector3f& gaze,        // Camera gaze direction
-           const Vector3f& up,          // Camera up direction
+           const glm::vec3& pos,         // Camera position
+           const glm::vec3& gaze,        // Camera gaze direction
+           const glm::vec3& up,          // Camera up direction
            const ImagePlane& imgPlane); // Image plane parameters
 
     // Computes the primary ray through pixel (row, col)
 	Ray getPrimaryRay(int row, int col) const;
 
 private:
-    Vector3f pos;         // Camera position
-    Vector3f gaze;        // Camera gaze direction
-    Vector3f up;
-    Vector3f u;
-    Vector3f DotProduct(const Vector3f& vector1,const Vector3f& vector2);
-    Vector3f pixelPositionOnImagePlane(int column , int row) const;
-    Vector3f normalizeVector(Vector3f v)const;
+   glm::vec3 pos;         // Camera position
+   glm::vec3 gaze;        // Camera gaze direction
+   glm::vec3 up;
+   glm::vec3 u;
+   glm::vec3 DotProduct(const glm::vec3& vector1,const glm::vec3& vector2);
+   glm::vec3 pixelPositionOnImagePlane(int column , int row) const;
+   glm::vec3 normalizeVector(glm::vec3 v)const;
 };
 
 #endif
