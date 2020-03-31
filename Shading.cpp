@@ -91,15 +91,16 @@ void Shading::calculateColor(IntersectionInfo& closestObjectInfo, Material mater
 	glm::vec3 blinnPhongShade = blinnPhongShading(lightVectorNormalized, cameraVectorNormalized, material, intensity, closestObjectInfo.hitNormal);
 	glm::vec3 diffuseShade = diffuseShading(lightVectorNormalized, material, intensity, closestObjectInfo.hitNormal);
 	shaders = diffuseShade + blinnPhongShade;
+
 }
 glm::vec3 Shading::blinnPhongShading(glm::vec3 lightRayVector, glm::vec3& cameraRayVector, Material& material, glm::vec3& lightIntensity, glm::vec3& normal)const
 {
 	glm::vec3 halfVector = normalize(lightRayVector + cameraRayVector);
-
+	
 	float cosAlpha = dot( halfVector,normal);
 
 	if (cosAlpha < 0) cosAlpha = 0;
-
+	
 	glm::vec3 blinnPhongLight = material.specularRef*vec3(lightIntensity) * pow(cosAlpha, material.phongExp);
 
 	return blinnPhongLight;

@@ -27,8 +27,10 @@ public:
 	BoundingBox* bounds;
 	Material* material;
 	vector<std::pair<char,int>> transformations;
+	Ray applyTransform(Ray rayTransformed) const;
+	glm::vec3 transformVector(glm::vec3& vect);
 	virtual IntersectionInfo intersect(const Ray & ray) const = 0; // Pure virtual method for intersection test. You must implement this for sphere, triangle, and mesh.
-	virtual BoundingBox* getBounds();
+	virtual BoundingBox* getBounds()= 0;
     Shape(void);
 	Shape(int id, int matIndex, Material* material, ShapeType type, vector<std::pair<char, int>> transformations); // Constructor
 
@@ -43,6 +45,7 @@ public:
 	
 	Sphere(void);	// Constructor
 	Sphere(int id, int matIndex, Material* material, int cIndex, float R, vector<glm::vec3> *vertices,ShapeType type, vector<std::pair<char, int>> transformations);	// Constructor
+	
 	IntersectionInfo intersect(const Ray & ray) const;	// Will take a ray and return a structure related to the intersection information. You will implement this.
 	BoundingBox* getBounds();
 private:
@@ -74,7 +77,7 @@ public:
 	Mesh(int id, int matIndex, Material* material, const vector<Triangle>& faces, vector<int> *pIndices, vector<glm::vec3> *vertices, ShapeType type, vector<std::pair<char, int>> transformations);	// Constructor
 	void MeshVolumeIntersection(const Ray& ray, Node* node, IntersectionInfo* intersecion_info) const;
 	IntersectionInfo intersect(const Ray & ray) const; // Will take a ray and return a structure related to the intersection information. You will implement this.
-	BoundingBox* getBounds();
+	BoundingBox* getBounds() ;
 private:
 	 const vector<Triangle> faces;
 

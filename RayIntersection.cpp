@@ -16,6 +16,7 @@ void RayIntersection::BoundingBoxIntersection(Ray ray,Node *node,IntersectionInf
 			const Shape* shape = objects[node->ObjectIDs[0]];
 			if (shape->bounds->isIntersect(ray) <=t_min)
 			{
+				
 				IntersectionInfo intesectionInfo = shape->intersect(ray);
 				if (intesectionInfo.isIntersect == true)
 				{

@@ -14,8 +14,8 @@ public:
 	glm::vec3 max;
 	BoundingBox()
 	{
-		min = { INT16_MAX,INT16_MAX ,INT16_MAX };
-		max = { INT16_MIN,INT16_MIN ,INT16_MIN };
+		min = glm::vec3{ INT16_MAX,INT16_MAX ,INT16_MAX };
+		max = glm::vec3{ INT16_MIN,INT16_MIN ,INT16_MIN };
 	
 	}
 	BoundingBox(BoundingBox box1, BoundingBox box2)

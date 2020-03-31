@@ -80,12 +80,11 @@ void Scene::renderImage(Camera* camera, Image* image)
 	int maxWidth = (imagePlane.nx);
 	for (int w = 0; w < maxWidth; w++)
 	{
-
 		for (int h = 0; h < imagePlane.ny; h++)
 		{
 
 			Ray ray = camera->getPrimaryRay(w, h);
-
+	
 			// Selecting Closest object to the camera
 			IntersectionInfo closestObjectReturnVal = rayIntersection->closestObject(ray);
 			if (closestObjectReturnVal.objectID == -1) // ray hits nothing
@@ -125,30 +124,38 @@ void Scene::renderImagePart(float start,float end, Camera* camera, Image* image)
 
 		for (int w = 0; w <imagePlane.nx; w++)
 		{
-
 			for (int h =start*imagePlane.ny; h < end* imagePlane.ny; h++)
 			{
-				
 				Ray ray = camera->getPrimaryRay(w, h);
 			
+			
+				
+				
+				//	ray.origin    = transformation->inverseRotation(0, vec4(ray.origin, 1));
+			
 				// Selecting Closest object to the camera
-				closestObjectReturnVal = rayIntersection->closestObject(ray);
-				if (closestObjectReturnVal.isIntersect == false) // ray hits nothing
+				IntersectionInfo closestObjectReturnVal = rayIntersection->closestObject(ray);
+				if (closestObjectReturnVal.objectID == -1) // ray hits nothing
 				{
 					// Set background Color 
-					Color background = { (unsigned int)backgroundColor.r,(unsigned int)backgroundColor.g,(unsigned int)backgroundColor.b };
+					Color background = { (unsigned char)backgroundColor.r,(unsigned char)backgroundColor.g,(unsigned char)backgroundColor.b };
+					background.red = background.red > 255 ? 255 : background.red;
+					background.grn = background.grn > 255 ? 255 : background.grn;
+					background.blu = background.blu > 255 ? 255 : background.blu;
 					image->setPixelValue(w, h, background);
 				}
 				else // if ray hits an object
 				{
+					
 					// start Shading a object
+
 					shape = objects[closestObjectReturnVal.objectID];
 					vec3 shadingColor = shading->shading(maxRecursionDepth, shape, closestObjectReturnVal, ray);
+					//  cout<<(int)color.red<< " "<<(int)color.grn<< " "<<(int)color.blu<< " "<<endl;
 					shadingColor.x = shadingColor.x > 255 ? 255 : shadingColor.x;
 					shadingColor.y = shadingColor.y > 255 ? 255 : shadingColor.y;
 					shadingColor.z = shadingColor.z > 255 ? 255 : shadingColor.z;
 					Color lastColor = Color{ (unsigned int)shadingColor.x,(unsigned int)shadingColor.y,(unsigned int)shadingColor.z };
-				
 					image->setPixelValue(w, h, lastColor);
 				}
 				
@@ -394,7 +401,7 @@ void Scene::readXML(const char* xmlPath)
 			str = scaling->GetText();
 			sscanf(str, "%f %f %f", &trans.x,
 				&trans.y, &trans.z);
-			cout << trans.x << " " << trans.y << " " << trans.z << endl;
+		
 			transformation->scalingList.push_back(trans);
 
 
@@ -422,7 +429,7 @@ void Scene::readXML(const char* xmlPath)
 	}
 	
 
-
+	
 	
 	// Parse vertex data
 	pElement = pRoot->FirstChildElement("VertexData");
@@ -535,6 +542,7 @@ void Scene::readXML(const char* xmlPath)
 		}
 		else
 		{
+			
 			objElement->QueryIntAttribute("vertexOffset", &vertexOffset);
 			str = objElement->GetText();
 			while (str[cursor] == ' ' || str[cursor] == '\t' || str[cursor] == '\n')
@@ -554,20 +562,22 @@ void Scene::readXML(const char* xmlPath)
 					while (str[cursor] == ' ' || str[cursor] == '\t' || str[cursor] == '\n')
 						cursor++;
 				}
+				
 				Material* material = materials[matIndex - 1];
 				faces.push_back(*(new Triangle(id, matIndex - 1, material, p1Index, p2Index, p3Index, &vertices, TriangleShape, transformList)));
 				meshIndices->push_back(p1Index);
 				meshIndices->push_back(p2Index);
 				meshIndices->push_back(p3Index);
 			}
+			
 			Material* material = materials[matIndex - 1];
 			objects.push_back(new Mesh(idCount++, matIndex - 1, material, faces, meshIndices, &vertices, MeshType, transformList));
-
+			
 			
 		}
 		pObject = pObject->NextSiblingElement("Mesh");
 	}
-
+	
 	// Parse spheres
 	pObject = pElement->FirstChildElement("Sphere");
 
@@ -695,8 +705,10 @@ void Scene::readXML(const char* xmlPath)
 Scene::Scene(const char* xmlPath)
 {
 	transformation = new Transformation();
+	pScene = this;
 	readXML(xmlPath);
 	cout << "xml readed" << endl;
+	
 	initObjects();
 	for (Shape* obj : objects)
 		obj->getBounds();
@@ -709,9 +721,9 @@ void Scene::setScene()
 	for (int i = 0; i < materials.size(); i++)
 	{
 		Material mat = *materials[i];
-		ambientLightList[i].x = (unsigned int)(mat.ambientRef.x * ambientLight.x);
-		ambientLightList[i].y = (unsigned int)(mat.ambientRef.y * ambientLight.y);
-		ambientLightList[i].z = (unsigned int)(mat.ambientRef.z * ambientLight.z);
+		ambientLightList[i].x = (mat.ambientRef.x * ambientLight.x);
+		ambientLightList[i].y = (mat.ambientRef.y * ambientLight.y);
+		ambientLightList[i].z = (mat.ambientRef.z * ambientLight.z);
 	}
 	cameraCount = cameras.size();
 }
@@ -719,6 +731,8 @@ void Scene::setScene()
 void Scene::initObjects()
 {
 	setScene();
+
+	transformation->initMatrices();
 	rayIntersection = new RayIntersection(objects, objectCount);
 	reflection = new Reflection(shadowRayEps,&objects,backgroundColor);
 	shading = new Shading(shadowRayEps,materials,ambientLightList,lightCount,objectCount,lights,&objects);
@@ -732,7 +746,7 @@ void Scene::initObjects()
 
 	
 	rayIntersection->boundingVolume = boundingVolume;
-	transformation->initMatrices();
+	
 	
 }
 

@@ -1,6 +1,7 @@
 #include "Camera.h"
 #include <iostream>
 #include <cmath>
+#include "RayTracing/glm/detail/func_geometric.inl"
 using namespace std;
 Camera::Camera(int id,                      // Id of the camera
                const char* imageName,       // Name of the output PPM file
@@ -21,7 +22,7 @@ Camera::Camera(int id,                      // Id of the camera
     this->gaze = normalizeVector(gaze);
     this->up = normalizeVector(up);
     this->imgPlane = imgPlane;
-    this->u = up*gaze;
+    this->u = cross(up,gaze);
 	u = normalizeVector(u);
 }
 
@@ -32,8 +33,8 @@ Ray Camera::getPrimaryRay(int col, int row) const
 {
     glm::vec3 pixelPosition = pixelPositionOnImagePlane(row,col);
 
-    Ray ray = Ray(pos,normalizeVector(pixelPosition-pos));
-
+    Ray ray = Ray(pos,glm::normalize(pixelPosition-pos));
+	
     return ray;
 }
 
@@ -41,10 +42,10 @@ glm::vec3 Camera::pixelPositionOnImagePlane(int row ,int column ) const
 {
       float s_u =imgPlane.right-(column+0.5)*((imgPlane.right-imgPlane.left)/imgPlane.nx);
       float s_v =imgPlane.top-  (row+0.5)*((imgPlane.top-imgPlane.bottom)/imgPlane.ny);
-
-
+	
+	
       glm::vec3 pixelPosition = up*s_v + u*s_u+pos+gaze*imgPlane.distance ;
-	 
+	  
       return pixelPosition;
 
 }
