@@ -14,14 +14,14 @@ public:
 	glm::vec3 max;
 	BoundingBox()
 	{
-		min = glm::vec3{ INT16_MAX,INT16_MAX ,INT16_MAX };
-		max = glm::vec3{ INT16_MIN,INT16_MIN ,INT16_MIN };
+		min = glm::vec3( INT16_MAX);
+		max = glm::vec3( INT16_MIN);
 	
 	}
 	BoundingBox(BoundingBox box1, BoundingBox box2)
 	{
-		min = getMin(box1.min, box2.min);
-		max = getMin(box1.max, box2.max);
+		min = glm::vec3(getMin(box1.min, box2.min));
+		max = glm::vec3(getMin(box1.max, box2.max));
 	}
 	/*BoundingBox(Shape* shape1, Shape* shape2)
 	{

@@ -10,15 +10,15 @@ int main(int argc, char *argv[])
 
 	/* Do your stuff here */
 	const char *xmlPath ;
-	xmlPath = "hw3/simple_transform.xml";
+	xmlPath = "hw1/spheres.xml";
 
 	clock_t tStart = clock();
 	for (int i = 0; i < 1; i++) 
 	{
 
 		pScene = new Scene(xmlPath);
-		cout << " end" << endl;
-		//pScene->readPly("hw2/ply/dragon_remeshed.ply");
+		pScene->initObjects();
+	
 		float time = (double)(clock() - tStart) / CLOCKS_PER_SEC;
 		printf("Time taken for construction: %.5fs\n", time);
 		 tStart = clock();

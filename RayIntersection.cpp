@@ -5,10 +5,31 @@
 
 void RayIntersection::BoundingBoxIntersection(Ray ray,Node *node,IntersectionInfo* retVal)
 {
-	
 	float t_min = retVal->t;
 	
-	float t_int = node->boundingBox.isIntersect(ray);
+	for (int i = 0 ; i < node->ObjectIDs.size();i++)
+	{
+		const Shape* shape = objects[node->ObjectIDs[i]];
+		Ray rayTransformed = Ray(ray.origin, ray.direction);
+		rayTransformed = shape->applyTransform(rayTransformed);
+		if (shape->bounds->isIntersect(rayTransformed) <= t_min)
+		{
+			
+			IntersectionInfo intesectionInfo = shape->intersect(ray,&rayTransformed);
+			if (intesectionInfo.isIntersect == true)
+			{
+				if (intesectionInfo.t <= t_min)
+				{
+					t_min = intesectionInfo.t;
+					intesectionInfo.objectID = node->ObjectIDs[i];
+					*retVal = intesectionInfo;
+				}
+			}
+		}
+	}
+	
+	/*float t_min = retVal->t;
+	float t_int = node->boundingBox->isIntersect(ray);
 	if (t_int != -1 && t_int<= t_min )
 	{
 		if(node->left == nullptr && node->right == nullptr)
@@ -38,7 +59,7 @@ void RayIntersection::BoundingBoxIntersection(Ray ray,Node *node,IntersectionInf
 		{
 			BoundingBoxIntersection(ray, node->right, retVal);
 		}
-	}
+	}*/
 }
 
 IntersectionInfo RayIntersection::closestObject(Ray ray)

@@ -15,7 +15,7 @@ void BoundingVolume::build(Node* node)
 	{
 		Shape* shape = (*objects)[node->ObjectIDs[i]];
 		BoundingBox *bounds = shape->getBounds();
-		node->boundingBox.extend(bounds);
+		node->boundingBox->extend(bounds);
 	}
 	if (size <= 1) return;
 	vector<std::pair<vec3, int>> midpoints;
@@ -50,7 +50,7 @@ void BoundingVolume::buildMeshVolume(Node* node)
 	{
 		Triangle shape = (*triangles)[node->ObjectIDs[i]];
 		BoundingBox* bounds = shape.getBounds();
-		node->boundingBox.extend(bounds);
+		node->boundingBox->extend(bounds);
 	}
 	if (size <= 1) return;
 	vector<std::pair<glm::vec3,int>> midpoints;

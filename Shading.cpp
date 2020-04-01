@@ -62,6 +62,7 @@ bool Shading::isShadow(glm::vec3& lightPosition, glm::vec3& intersectionPoint)co
 	Ray shadowRay = Ray((intersectionPoint + normalize(lightVector) * shadowRayEps), normalize(lightVector));
 	Ray shadowRay_ = Ray(intersectionPoint, normalize(lightVector));
 	float tFromIntersectionToLight = shadowRay_.gett(lightPosition);
+	
 	IntersectionInfo returnVal = rayIntersection->closestObject(shadowRay);
 	Shape* shadowShape;
 	if (returnVal.t < tFromIntersectionToLight)
@@ -91,6 +92,7 @@ void Shading::calculateColor(IntersectionInfo& closestObjectInfo, Material mater
 	glm::vec3 blinnPhongShade = blinnPhongShading(lightVectorNormalized, cameraVectorNormalized, material, intensity, closestObjectInfo.hitNormal);
 	glm::vec3 diffuseShade = diffuseShading(lightVectorNormalized, material, intensity, closestObjectInfo.hitNormal);
 	shaders = diffuseShade + blinnPhongShade;
+
 
 }
 glm::vec3 Shading::blinnPhongShading(glm::vec3 lightRayVector, glm::vec3& cameraRayVector, Material& material, glm::vec3& lightIntensity, glm::vec3& normal)const

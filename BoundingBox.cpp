@@ -15,19 +15,19 @@ void BoundingBox::extend(Shape* shape)
 
 glm::vec3  BoundingBox::getMin(glm::vec3 v1, glm::vec3 v2)
 {
-	return glm::vec3{
-		{v1.x < v2.x ? v1.x : v2.x},
-		{v1.y < v2.y ? v1.y : v2.y},
-		{v1.z < v2.z ? v1.z : v2.z}
-	};
+	return glm::vec3(
+		v1.x < v2.x ? v1.x : v2.x,
+		v1.y < v2.y ? v1.y : v2.y,
+		v1.z < v2.z ? v1.z : v2.z
+	);
 }
 glm::vec3 BoundingBox::getMax(glm::vec3 v1, glm::vec3 v2)
 {
-	return glm::vec3{
-		{v1.x < v2.x ? v2.x : v1.x},
-		{v1 .y < v2.y ? v2.y : v1.y},
-		{v1.z < v2.z ? v2.z : v1.z}
-	};
+	return glm::vec3(
+		v1.x < v2.x ? v2.x : v1.x,
+		v1 .y < v2.y ? v2.y : v1.y,
+		v1.z < v2.z ? v2.z : v1.z
+	);
 }
 
 template <typename T>
@@ -46,6 +46,7 @@ float BoundingBox::isIntersect(Ray r)
 
 	// Check for x 
 	float tnn = (min.x - r.origin.x) / r.direction.x;
+
 	float tff = (max.x - r.origin.x) / r.direction.x;
 
 	if (tnn > tff)

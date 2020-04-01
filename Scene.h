@@ -28,7 +28,12 @@ class Material;
 class Shape;
 class BoundingVolume;
 using namespace std;
-
+static void printVector(vec3 vect, const char* optional = nullptr)
+{
+	if(optional != nullptr)
+	cout << optional ;
+	cout << "x: " << vect.x << " y: " << vect.y << " z: " << vect.z << endl;
+}
 // Class to hold everything related to a scene.
 class Scene
 {
@@ -63,7 +68,7 @@ public:
 	void convertPPMToPNG(string ppmFileName, int osType);
 	void readPly(const char* str, const vector<Triangle>& faces, vector<int>* is);
 	void readXML(const char* xmlPath);
-
+	
 
 private:
 
