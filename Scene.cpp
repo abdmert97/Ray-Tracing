@@ -128,6 +128,11 @@ void Scene::renderImagePart(float start,float end, Camera* camera, Image* image)
 			{
 				Ray ray = camera->getPrimaryRay(w, h);
 			
+			
+				
+				
+				//	ray.origin    = transformation->inverseRotation(0, vec4(ray.origin, 1));
+			
 				// Selecting Closest object to the camera
 				IntersectionInfo closestObjectReturnVal = rayIntersection->closestObject(ray);
 				if (closestObjectReturnVal.objectID == -1) // ray hits nothing
@@ -703,7 +708,10 @@ Scene::Scene(const char* xmlPath)
 	pScene = this;
 	readXML(xmlPath);
 	cout << "xml readed" << endl;
-
+	
+	initObjects();
+	for (Shape* obj : objects)
+		obj->getBounds();
 }
 void Scene::setScene()
 {
@@ -718,16 +726,13 @@ void Scene::setScene()
 		ambientLightList[i].z = (mat.ambientRef.z * ambientLight.z);
 	}
 	cameraCount = cameras.size();
-	transformation->initMatrices();
-	for (Shape* obj : objects)
-		obj->getBounds();
 }
 
 void Scene::initObjects()
 {
 	setScene();
-	
-	
+
+	transformation->initMatrices();
 	rayIntersection = new RayIntersection(objects, objectCount);
 	reflection = new Reflection(shadowRayEps,&objects,backgroundColor);
 	shading = new Shading(shadowRayEps,materials,ambientLightList,lightCount,objectCount,lights,&objects);

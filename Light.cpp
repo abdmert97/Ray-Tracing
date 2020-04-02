@@ -16,5 +16,5 @@ glm::vec3 PointLight::computeLightContribution(const glm::vec3& p)
                             distance.y*distance.y+
                             distance.z*distance.z;
 
-    return intensity*(1/distanceSquare);
+    return intensity*(1.0f/distanceSquare);
 }
