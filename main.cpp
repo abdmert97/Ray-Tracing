@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
 
 	/* Do your stuff here */
 	const char *xmlPath ;
-	xmlPath = "hw2/spheres.xml";
+	xmlPath = "hw3/cornellbox_brushed_metal.xml";
 
 	clock_t tStart = clock();
 	for (int i = 0; i < 1; i++) 

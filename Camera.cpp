@@ -1,7 +1,7 @@
 #include "Camera.h"
 #include <iostream>
 #include <cmath>
-#include "RayTracing/glm/detail/func_geometric.inl"
+
 using namespace std;
 Camera::Camera(int id,                      // Id of the camera
                const char* imageName,       // Name of the output PPM file
@@ -29,24 +29,42 @@ Camera::Camera(int id,                      // Id of the camera
 /* Takes coordinate of an image pixel as row and col, and
  * returns the ray going through that pixel.
  */
-Ray Camera::getPrimaryRay(int col, int row) const
+Ray Camera::getPrimaryRay(int col, int row, int xSample, int ySample) const
 {
-    glm::vec3 pixelPosition = pixelPositionOnImagePlane(row,col);
+    glm::vec3 pixelPosition = pixelPositionOnImagePlane(row,col,xSample,ySample);
 
     Ray ray = Ray(pos,glm::normalize(pixelPosition-pos));
 	
     return ray;
 }
 
-glm::vec3 Camera::pixelPositionOnImagePlane(int row ,int column ) const
+glm::vec3 Camera::pixelPositionOnImagePlane(int row ,int column,int xSample ,int ySample ) const
 {
-      float s_u =imgPlane.right-(column+0.5)*((imgPlane.right-imgPlane.left)/imgPlane.nx);
-      float s_v =imgPlane.top-  (row+0.5)*((imgPlane.top-imgPlane.bottom)/imgPlane.ny);
+	int sample = pScene->numberofSample;
+	if(sample != 0)
+	{
+		float x = (float)xSample / sample;
+		float y = (float)ySample / sample;
+		
+		float s_u = imgPlane.right - (column + xSample) * ((imgPlane.right - imgPlane.left) / imgPlane.nx);
+		float s_v = imgPlane.top - (row + ySample) * ((imgPlane.top - imgPlane.bottom) / imgPlane.ny);
+
+
+		glm::vec3 pixelPosition = up * s_v + u * s_u + pos + gaze * imgPlane.distance;
+		return pixelPosition;
+	}
+	else
+	{
+		float s_u = imgPlane.right - (column + 0.5) * ((imgPlane.right - imgPlane.left) / imgPlane.nx);
+		float s_v = imgPlane.top - (row + 0.5) * ((imgPlane.top - imgPlane.bottom) / imgPlane.ny);
+
+
+		glm::vec3 pixelPosition = up * s_v + u * s_u + pos + gaze * imgPlane.distance;
+		return pixelPosition;
+	}
 	
-	
-      glm::vec3 pixelPosition = up*s_v + u*s_u+pos+gaze*imgPlane.distance ;
-	  
-      return pixelPosition;
+		
+
 
 }
 

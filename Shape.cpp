@@ -300,44 +300,88 @@ IntersectionInfo Triangle::intersect(const Ray& ray, Ray* rayTransformed) const
 
 void Mesh::MeshVolumeIntersection(const Ray& ray, Node* node, IntersectionInfo* intersecion_info) const
 {
-	Ray rayTransformed = Ray(ray.origin, ray.direction);
-	rayTransformed = this->applyTransform(rayTransformed);
-	float t_int = node->boundingBox->isIntersect(rayTransformed);
-	if (t_int != -1 && t_int <= intersecion_info->t)
+	
+	if(pScene->isTransformed)
 	{
-
-		if (node->left == nullptr && node->right == nullptr)
+		Ray rayTransformed = Ray(ray.origin, ray.direction);
+		rayTransformed = this->applyTransform(rayTransformed);
+		float t_int = node->boundingBox->isIntersect(rayTransformed);
+		if (t_int != -1 && t_int <= intersecion_info->t)
 		{
-			 Triangle shape = faces[node->ObjectIDs[0]];
-			if (shape.bounds == nullptr)
-				shape.getBounds();
-			
-			if (shape.bounds->isIntersect(rayTransformed) <= intersecion_info->t)
+
+			if (node->left == nullptr && node->right == nullptr)
 			{
-				float t_min = intersecion_info->t;
-			
-			
-				IntersectionInfo intesectionInfo = shape.intersect(ray, &rayTransformed);
-				if (intesectionInfo.isIntersect == true)
+				Triangle shape = faces[node->ObjectIDs[0]];
+				if (shape.bounds == nullptr)
+					shape.getBounds();
+
+				if (shape.bounds->isIntersect(rayTransformed) <= intersecion_info->t)
 				{
-					if (intesectionInfo.t <= t_min)
+					float t_min = intersecion_info->t;
+
+
+					IntersectionInfo intesectionInfo = shape.intersect(ray, &rayTransformed);
+					if (intesectionInfo.isIntersect == true)
 					{
-						t_min = intesectionInfo.t;
-						intesectionInfo.objectID = node->ObjectIDs[0];
-						*intersecion_info = intesectionInfo;
+						if (intesectionInfo.t <= t_min)
+						{
+							t_min = intesectionInfo.t;
+							intesectionInfo.objectID = node->ObjectIDs[0];
+							*intersecion_info = intesectionInfo;
+						}
 					}
 				}
 			}
-		}
-		if (node->left != nullptr)
-		{
-			MeshVolumeIntersection(ray, node->left, intersecion_info);
-		}
-		if (node->right != nullptr)
-		{
-			MeshVolumeIntersection(ray, node->right, intersecion_info);
+			if (node->left != nullptr)
+			{
+				MeshVolumeIntersection(ray, node->left, intersecion_info);
+			}
+			if (node->right != nullptr)
+			{
+				MeshVolumeIntersection(ray, node->right, intersecion_info);
+			}
 		}
 	}
+	else
+	{
+		float t_int = node->boundingBox->isIntersect(ray);
+		if (t_int != -1 && t_int <= intersecion_info->t)
+		{
+
+			if (node->left == nullptr && node->right == nullptr)
+			{
+				Triangle shape = faces[node->ObjectIDs[0]];
+				if (shape.bounds == nullptr)
+					shape.getBounds();
+
+				if (shape.bounds->isIntersect(ray) <= intersecion_info->t)
+				{
+					float t_min = intersecion_info->t;
+
+
+					IntersectionInfo intesectionInfo = shape.intersect(ray);
+					if (intesectionInfo.isIntersect == true)
+					{
+						if (intesectionInfo.t <= t_min)
+						{
+							t_min = intesectionInfo.t;
+							intesectionInfo.objectID = node->ObjectIDs[0];
+							*intersecion_info = intesectionInfo;
+						}
+					}
+				}
+			}
+			if (node->left != nullptr)
+			{
+				MeshVolumeIntersection(ray, node->left, intersecion_info);
+			}
+			if (node->right != nullptr)
+			{
+				MeshVolumeIntersection(ray, node->right, intersecion_info);
+			}
+		}
+	}
+	
 
 }
 

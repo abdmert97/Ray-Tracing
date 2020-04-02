@@ -76,7 +76,7 @@ void Scene::renderImage(Camera* camera, Image* image)
 	ImagePlane imagePlane = camera->imgPlane;
 	IntersectionInfo returnValue;
 	Shape* shape;
-	Color color = { 0,0,0 };
+
 	int maxWidth = (imagePlane.nx);
 	for (int w = 0; w < maxWidth; w++)
 	{
@@ -116,50 +116,84 @@ void Scene::renderImage(Camera* camera, Image* image)
 void Scene::renderImagePart(float start,float end, Camera* camera, Image* image)
 {
 
-		ImagePlane imagePlane = camera->imgPlane;
+		;
 	
-		IntersectionInfo closestObjectReturnVal;
 		Shape* shape;
-		Color color = { 0,0,0 };
 
-		for (int w = 0; w <imagePlane.nx; w++)
+		for (int w = 0; w < camera->imgPlane.nx; w++)
 		{
-			for (int h =start*imagePlane.ny; h < end* imagePlane.ny; h++)
+			for (int h =start* camera->imgPlane.ny; h < end* camera->imgPlane.ny; h++)
 			{
-				Ray ray = camera->getPrimaryRay(w, h);
-			
-			
-				
-				
+				Ray ray;
+				vec3 totalColor = vec3(0);
+				if(numberofSample != 0)
+				{
+					int sample = 1;
+					for (int i = 0; i < sample;i++)
+					{
+						for (int j = 0; j < sample; j++)
+						{
+							 ray = camera->getPrimaryRay(w, h,i,j);
+							 IntersectionInfo closestObjectReturnVal = rayIntersection->closestObject(ray);
+							 if (closestObjectReturnVal.objectID == -1) // ray hits nothing
+							 {
+								 // Set background Color 
+								
+								 totalColor += backgroundColor;
+							
+							 }
+							 else // if ray hits an object
+							 {
+
+								 // start Shading a object
+
+								 shape = objects[closestObjectReturnVal.objectID];
+								 vec3 shadingColor = shading->shading(maxRecursionDepth, shape, closestObjectReturnVal, ray);
+								 //  cout<<(int)color.red<< " "<<(int)color.grn<< " "<<(int)color.blu<< " "<<endl;
+								 shadingColor.x = shadingColor.x > 255 ? 255 : shadingColor.x;
+								 shadingColor.y = shadingColor.y > 255 ? 255 : shadingColor.y;
+								 shadingColor.z = shadingColor.z > 255 ? 255 : shadingColor.z;
+								
+								 totalColor += shadingColor;
+							 
+							 }
+						}
+					}
+					Color res = { totalColor.x/(sample * sample),totalColor.y / (sample * sample),totalColor.z / (sample * sample) };
+					
+					image->setPixelValue(w, h, res);
+				}
+				else
+				{
+					ray = camera->getPrimaryRay(w, h);
+					IntersectionInfo closestObjectReturnVal = rayIntersection->closestObject(ray);
+					if (closestObjectReturnVal.objectID == -1) // ray hits nothing
+					{
+						// Set background Color 
+						Color background = { (unsigned char)backgroundColor.r,(unsigned char)backgroundColor.g,(unsigned char)backgroundColor.b };
+						background.red = background.red > 255 ? 255 : background.red;
+						background.grn = background.grn > 255 ? 255 : background.grn;
+						background.blu = background.blu > 255 ? 255 : background.blu;
+						image->setPixelValue(w, h, background);
+					}
+					else // if ray hits an object
+					{
+
+						// start Shading a object
+
+						shape = objects[closestObjectReturnVal.objectID];
+						vec3 shadingColor = shading->shading(maxRecursionDepth, shape, closestObjectReturnVal, ray);
+						//  cout<<(int)color.red<< " "<<(int)color.grn<< " "<<(int)color.blu<< " "<<endl;
+						shadingColor.x = shadingColor.x > 255 ? 255 : shadingColor.x;
+						shadingColor.y = shadingColor.y > 255 ? 255 : shadingColor.y;
+						shadingColor.z = shadingColor.z > 255 ? 255 : shadingColor.z;
+						Color lastColor = Color{ (unsigned int)shadingColor.x,(unsigned int)shadingColor.y,(unsigned int)shadingColor.z };
+						image->setPixelValue(w, h, lastColor);
+					}
+				}
 				//	ray.origin    = transformation->inverseRotation(0, vec4(ray.origin, 1));
 			
 				// Selecting Closest object to the camera
-				IntersectionInfo closestObjectReturnVal = rayIntersection->closestObject(ray);
-				if (closestObjectReturnVal.objectID == -1) // ray hits nothing
-				{
-					// Set background Color 
-					Color background = { (unsigned char)backgroundColor.r,(unsigned char)backgroundColor.g,(unsigned char)backgroundColor.b };
-					background.red = background.red > 255 ? 255 : background.red;
-					background.grn = background.grn > 255 ? 255 : background.grn;
-					background.blu = background.blu > 255 ? 255 : background.blu;
-					image->setPixelValue(w, h, background);
-				}
-				else // if ray hits an object
-				{
-					
-					// start Shading a object
-
-					shape = objects[closestObjectReturnVal.objectID];
-					vec3 shadingColor = shading->shading(maxRecursionDepth, shape, closestObjectReturnVal, ray);
-					//  cout<<(int)color.red<< " "<<(int)color.grn<< " "<<(int)color.blu<< " "<<endl;
-					shadingColor.x = shadingColor.x > 255 ? 255 : shadingColor.x;
-					shadingColor.y = shadingColor.y > 255 ? 255 : shadingColor.y;
-					shadingColor.z = shadingColor.z > 255 ? 255 : shadingColor.z;
-					Color lastColor = Color{ (unsigned int)shadingColor.x,(unsigned int)shadingColor.y,(unsigned int)shadingColor.z };
-					image->setPixelValue(w, h, lastColor);
-				}
-				
-				
 			}
 		}
 		
@@ -203,7 +237,7 @@ void Scene::readXML(const char* xmlPath)
 	isTransformed = false;
 	maxRecursionDepth = 1;
 	shadowRayEps = 0.001;
-
+	numberofSample = 0;
 	eResult = xmlDoc.LoadFile(xmlPath);
 
 	XMLNode* pRoot = xmlDoc.FirstChild();
@@ -211,7 +245,9 @@ void Scene::readXML(const char* xmlPath)
 	pElement = pRoot->FirstChildElement("MaxRecursionDepth");
 	if (pElement != nullptr)
 		pElement->QueryIntText(&maxRecursionDepth);
+	
 
+	
 	pElement = pRoot->FirstChildElement("BackgroundColor");
 	str = pElement->GetText();
 	sscanf(str, "%f %f %f", &backgroundColor.r, &backgroundColor.g, &backgroundColor.b);
@@ -259,10 +295,15 @@ void Scene::readXML(const char* xmlPath)
 
 			camElement = pCamera->FirstChildElement("NearDistance");
 			eResult = camElement->QueryFloatText(&imgPlane.distance);
+			camElement = pCamera->FirstChildElement("NumSamples");
+			eResult = camElement->QueryIntText(&numberofSample);
 
 			camElement = pCamera->FirstChildElement("ImageResolution");
 			str = camElement->GetText();
 			sscanf(str, "%d %d", &imgPlane.nx, &imgPlane.ny);
+
+
+			
 
 			camElement = pCamera->FirstChildElement("ImageName");
 			str = camElement->GetText();
@@ -298,6 +339,8 @@ void Scene::readXML(const char* xmlPath)
 			sscanf(str, "%f %f %f %f", &imgPlane.left, &imgPlane.right, &imgPlane.bottom, &imgPlane.top);
 			camElement = pCamera->FirstChildElement("NearDistance");
 			eResult = camElement->QueryFloatText(&imgPlane.distance);
+			camElement = pCamera->FirstChildElement("NumSamples");
+			eResult = camElement->QueryIntText(&numberofSample);
 			camElement = pCamera->FirstChildElement("ImageResolution");
 			str = camElement->GetText();
 			sscanf(str, "%d %d", &imgPlane.nx, &imgPlane.ny);
