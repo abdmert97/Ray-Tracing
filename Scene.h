@@ -39,6 +39,7 @@ class Scene
 {
 public:
 	static int maxRecursionDepth;			// Maximum recursion depth
+	bool isTransformed;
 	float intTestEps;				// IntersectionTestEpsilon. You will need this one while implementing intersect routines in Shape class
 	float shadowRayEps;				// ShadowRayEpsilon. You will need this one while generating shadow rays.
 	glm::vec3 backgroundColor;		// Background color

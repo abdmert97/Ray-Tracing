@@ -200,7 +200,7 @@ void Scene::readXML(const char* xmlPath)
 	XMLDocument xmlDoc;
 	XMLError eResult;
 	XMLElement* pElement;
-
+	isTransformed = false;
 	maxRecursionDepth = 1;
 	shadowRayEps = 0.001;
 
@@ -376,6 +376,7 @@ void Scene::readXML(const char* xmlPath)
 	pElement = pRoot->FirstChildElement("Transformations");
 	if(pElement != nullptr)
 	{
+		isTransformed = true;
 		XMLElement* translation = pElement->FirstChildElement("Translation");
 		while (translation != nullptr)
 		{

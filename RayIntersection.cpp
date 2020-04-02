@@ -1,65 +1,73 @@
 #include "RayIntersection.h"
 #include <algorithm>
 
-
+#include "Scene.h"
 
 void RayIntersection::BoundingBoxIntersection(Ray ray,Node *node,IntersectionInfo* retVal)
 {
-	float t_min = retVal->t;
-	
-	for (int i = 0 ; i < node->ObjectIDs.size();i++)
+
+	if(pScene->isTransformed == true)
 	{
-		const Shape* shape = objects[node->ObjectIDs[i]];
-		Ray rayTransformed = Ray(ray.origin, ray.direction);
-		rayTransformed = shape->applyTransform(rayTransformed);
-		if (shape->bounds->isIntersect(rayTransformed) <= t_min)
+		float t_min = retVal->t;
+
+		for (int i = 0; i < node->ObjectIDs.size(); i++)
 		{
-			
-			IntersectionInfo intesectionInfo = shape->intersect(ray,&rayTransformed);
-			if (intesectionInfo.isIntersect == true)
+			const Shape* shape = objects[node->ObjectIDs[i]];
+			Ray rayTransformed = Ray(ray.origin, ray.direction);
+			rayTransformed = shape->applyTransform(rayTransformed);
+			if (shape->bounds->isIntersect(rayTransformed) <= t_min)
 			{
-				if (intesectionInfo.t <= t_min)
-				{
-					t_min = intesectionInfo.t;
-					intesectionInfo.objectID = node->ObjectIDs[i];
-					*retVal = intesectionInfo;
-				}
-			}
-		}
-	}
-	
-	/*float t_min = retVal->t;
-	float t_int = node->boundingBox->isIntersect(ray);
-	if (t_int != -1 && t_int<= t_min )
-	{
-		if(node->left == nullptr && node->right == nullptr)
-		{
-			const Shape* shape = objects[node->ObjectIDs[0]];
-			if (shape->bounds->isIntersect(ray) <=t_min)
-			{
-				
-				IntersectionInfo intesectionInfo = shape->intersect(ray);
+
+				IntersectionInfo intesectionInfo = shape->intersect(ray, &rayTransformed);
 				if (intesectionInfo.isIntersect == true)
 				{
 					if (intesectionInfo.t <= t_min)
 					{
 						t_min = intesectionInfo.t;
-						intesectionInfo.objectID = node->ObjectIDs[0];
+						intesectionInfo.objectID = node->ObjectIDs[i];
 						*retVal = intesectionInfo;
 					}
 				}
 			}
 		}
-		if (node->left != nullptr)
+	}
+	
+	else
+	{
+		float t_min = retVal->t;
+		float t_int = node->boundingBox->isIntersect(ray);
+		if (t_int != -1 && t_int <= t_min)
 		{
-			BoundingBoxIntersection(ray, node->left, retVal);
-		}
+			if (node->left == nullptr && node->right == nullptr)
+			{
+				const Shape* shape = objects[node->ObjectIDs[0]];
+				if (shape->bounds->isIntersect(ray) <= t_min)
+				{
 
-		if (node->right != nullptr)
-		{
-			BoundingBoxIntersection(ray, node->right, retVal);
+					IntersectionInfo intesectionInfo = shape->intersect(ray);
+					if (intesectionInfo.isIntersect == true)
+					{
+						if (intesectionInfo.t <= t_min)
+						{
+							t_min = intesectionInfo.t;
+							intesectionInfo.objectID = node->ObjectIDs[0];
+							*retVal = intesectionInfo;
+						}
+					}
+				}
+			}
+			if (node->left != nullptr)
+			{
+				BoundingBoxIntersection(ray, node->left, retVal);
+			}
+
+			if (node->right != nullptr)
+			{
+				BoundingBoxIntersection(ray, node->right, retVal);
+			}
 		}
-	}*/
+	}
+	/**/
 }
 
 IntersectionInfo RayIntersection::closestObject(Ray ray)

@@ -53,6 +53,41 @@ class Transformation
 
 			return vec4(values[0], values[1], values[2], values[3]);
 		}
+		mat4x4 multiplyMatrixWithMatrix(mat4x4 m,mat4x4 m2)
+		{
+			double values[4];
+			double total;
+			mat4x4 result = mat4x4(0);
+			for (int i = 0; i < 4; i++)
+			{
+				total = 0;
+				for (int j = 0; j < 4; j++)
+				{
+					for (int k = 0; k < 4 ;k++)
+					{
+						result[i][j] += m[i][k] *m2[k][j];
+					}
+
+					
+				}
+			
+			}
+
+			return result;
+		}
+		mat4x4 transposeMatrix(mat4x4 m)
+		{
+			mat4x4 transpos;
+			for (int i = 0; i < 4; i++)
+			{
+
+				for (int j = 0; j < 4; j++)
+				{
+					transpos[j][i] = m[i][j];
+				}
+			}
+			return transpos;
+		}
 };
 
 

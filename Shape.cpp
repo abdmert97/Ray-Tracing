@@ -35,20 +35,26 @@ Ray Shape::applyTransform(Ray rayTransformed) const
 	M[1][1] = 1;
 	M[2][2] = 1;
 	M[3][3] = 1;
+	stack<std::pair<char, int>> stk;
 	for (std::pair<char, int> transform : transformations)
 	{
-		
-		if(transform.first == 't')
+		stk.push(transform);
+	}
+	while(stk.empty() != true)
+	{
+		std::pair<char, int> transform = stk.top();
+		stk.pop();
+		if (transform.first == 't')
 		{
-			M = *pScene->transformation->inverseTranslationMatrices[transform.second - 1] * M;
+			M = pScene->transformation->multiplyMatrixWithMatrix(*pScene->transformation->inverseTranslationMatrices[transform.second - 1], M);
 		}
 		else if (transform.first == 's')
 		{
-			M = *pScene->transformation->inverseScalingMatrices[transform.second - 1] * M;
+			M = pScene->transformation->multiplyMatrixWithMatrix(*pScene->transformation->inverseScalingMatrices[transform.second - 1], M);
 		}
 		else if (transform.first == 'r')
 		{
-			M = *pScene->transformation->inverseRotationMatrices[transform.second - 1] * M;
+			M = pScene->transformation->multiplyMatrixWithMatrix(*pScene->transformation->inverseRotationMatrices[transform.second - 1], M);
 		}
 	}
 	rayTransformed.direction = pScene->transformation->multiplyMatrixWithVec4(M, vec4(rayTransformed.direction, 0));
@@ -92,25 +98,31 @@ vec3 Shape::transformNormal(vec3& vect)const
 	M[1][1] = 1;
 	M[2][2] = 1;
 	M[3][3] = 1;
+	stack<std::pair<char, int>> stk;
 	for (std::pair<char, int> transform : transformations)
 	{
+		stk.push(transform);
+	}
+	while (stk.empty() != true)
+	{
+		std::pair<char, int> transform = stk.top();
+		stk.pop();
 		if (transform.first == 't')
 		{
-			M = *pScene->transformation->inverseTranslationMatrices[transform.second - 1] * M;
+			M = pScene->transformation->multiplyMatrixWithMatrix(*pScene->transformation->inverseTranslationMatrices[transform.second - 1], M);
 		}
 		else if (transform.first == 's')
 		{
-			M = *pScene->transformation->inverseScalingMatrices[transform.second - 1] * M;
+			M = pScene->transformation->multiplyMatrixWithMatrix(*pScene->transformation->inverseScalingMatrices[transform.second - 1], M);
 		}
 		else if (transform.first == 'r')
 		{
-			M = *pScene->transformation->inverseRotationMatrices[transform.second - 1] * M;
+			M = pScene->transformation->multiplyMatrixWithMatrix(*pScene->transformation->inverseRotationMatrices[transform.second - 1], M);
 		}
 	}
-	M = glm::transpose(M);
-
+	M = pScene->transformation->transposeMatrix(M);
 	vecTransformed = pScene->transformation->multiplyMatrixWithVec4(M, vecTransformed);
-	vecTransformed = vec4(0.9);
+
 	return vecTransformed;
 }
 BoundingBox* Sphere::getBounds()
@@ -196,8 +208,8 @@ IntersectionInfo Sphere::intersect(const Ray& ray, Ray* rayTransformed) const
 	IntersectionInfo returnValue = {};
 	returnValue.isIntersect = false;
 
-	glm::vec3 direction = rayTransformed != nullptr ? rayTransformed->direction : ray.direction;
-	glm::vec3 origin    = rayTransformed != nullptr ? rayTransformed->origin : ray.origin;
+	glm::vec3 direction = transformations.size() != 0 ? rayTransformed->direction : ray.direction;
+	glm::vec3 origin    = transformations.size() != 0 ? rayTransformed->origin : ray.origin;
 	glm::vec3 center = this->center;
 
 	float t = dot(direction * vec3(-1), (origin - center));
@@ -220,7 +232,7 @@ IntersectionInfo Sphere::intersect(const Ray& ray, Ray* rayTransformed) const
 	returnValue.t = intersectiont;
 	returnValue.objectID = id;
 	returnValue.hitNormal = normalize ((returnValue.intersectionPoint - center) / (this->radius));
-	if(rayTransformed != nullptr)
+	if(transformations.size() != 0)
 		returnValue.hitNormal = normalize(transformNormal(returnValue.hitNormal));
 	//    cout <<ray.getPoint(intersectionPoint1)<<" " << ray.getPoint(intersectionPoint2)<<endl ;
 	return returnValue;
@@ -231,8 +243,8 @@ IntersectionInfo Triangle::intersect(const Ray& ray, Ray* rayTransformed) const
 	returnValue.isIntersect = false;
 	returnValue.objectID = -1;
 
-	glm::vec3 rayDirection = rayTransformed != nullptr ? rayTransformed->direction: ray.direction;
-	glm::vec3 rayOrigin	   = rayTransformed != nullptr ? rayTransformed->origin   : ray.origin;
+	glm::vec3 rayDirection = transformations.size() != 0 ? rayTransformed->direction: ray.direction;
+	glm::vec3 rayOrigin	   = transformations.size() != 0 ? rayTransformed->origin   : ray.origin;
 	float AMatrix[3][3] = {
 
 			{point1.x - point2.x, point1.x - point3.x, rayDirection.x},
@@ -277,7 +289,7 @@ IntersectionInfo Triangle::intersect(const Ray& ray, Ray* rayTransformed) const
 		returnValue.intersectionPoint = ray.getPoint(t);
 		glm::vec3 crossProduct = cross((point2 - point1), (point3 - point1));
 		returnValue.hitNormal = glm::normalize(crossProduct);
-		if (rayTransformed != nullptr)
+		if (transformations.size() != 0)
 			returnValue.hitNormal = normalize(transformNormal(returnValue.hitNormal));
 	
 	}
