@@ -1,14 +1,13 @@
 #include "Camera.h"
-#include <iostream>
-#include <cmath>
 
+extern Scene* pScene;
 using namespace std;
 Camera::Camera(int id,                      // Id of the camera
                const char* imageName,       // Name of the output PPM file
                const glm::vec3& pos,         // Camera position
                const glm::vec3& gaze,        // Camera gaze direction
                const glm::vec3& up,          // Camera up direction
-               const ImagePlane& imgPlane)  // Image plane parameters
+               const ImagePlane& imgPlane,int sample)  // Image plane parameters
 {
     this->id  = id;
     int i = 0;
@@ -24,6 +23,8 @@ Camera::Camera(int id,                      // Id of the camera
     this->imgPlane = imgPlane;
     this->u = cross(up,gaze);
 	u = normalizeVector(u);
+	this->sample = sample;
+	
 }
 
 /* Takes coordinate of an image pixel as row and col, and
@@ -40,12 +41,12 @@ Ray Camera::getPrimaryRay(int col, int row, int xSample, int ySample) const
 
 glm::vec3 Camera::pixelPositionOnImagePlane(int row ,int column,int xSample ,int ySample ) const
 {
-	int sample = pScene->numberofSample;
+
 	if(sample != 0)
 	{
-		float x = (float)xSample / sample;
-		float y = (float)ySample / sample;
-		
+		float x = (float)xSample / sqrt(sample);
+		float y = (float)ySample / sqrt(sample);
+	
 		float s_u = imgPlane.right - (column + xSample) * ((imgPlane.right - imgPlane.left) / imgPlane.nx);
 		float s_v = imgPlane.top - (row + ySample) * ((imgPlane.top - imgPlane.bottom) / imgPlane.ny);
 

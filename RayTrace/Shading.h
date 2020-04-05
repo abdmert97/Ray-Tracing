@@ -1,18 +1,18 @@
 #ifndef _SHADING_H_
 #define _SHADING_H_
 
-#include  "defs.h"
-#include  "Ray.h"
-#include  "Shape.h"
-#include "Image.h"
-#include "Material.h"
 #include "Light.h"
-#include "Reflection.h"
-#include  "Refraction.h"
-#include "RayIntersection.h"
+#include "Scene.h"
+//#include "Reflection.h"
+//#include  "Refraction.h"
+
 class Reflection;
 class Refraction;
-class RayIntersection;
+
+class PointLight;
+class Material;
+class Shape;
+class IntersectionInfo;
 class Shading
 {
 
@@ -26,9 +26,9 @@ private:
 	vector<PointLight*> lights;
 	vector<Shape*> *objects;
 public:
-	Reflection* reflection;
-	RayIntersection* rayIntersection;
-	Refraction* refraction;
+	
+	
+
 	Shading( float shadow_ray_eps, const vector<Material*>& materials, glm::vec3* ambient_light_list,
 		int light_count, int object_count, const vector<PointLight*>& point_lights,vector<Shape*>* objects)
 		: 
@@ -51,7 +51,12 @@ private:
 	glm::vec3 diffuseShading(glm::vec3 lightRayVector, Material& material, glm::vec3& lightIntensity, glm::vec3& normal)const;
 public:
 	glm::vec3 shading(int depth, Shape*& shape, IntersectionInfo& closestObjectInfo, Ray& ray, float n_t =1);
-	
+	glm::vec3 reflect(const glm::vec3& incoming, const glm::vec3& normal);
+	void getReflection(int depth, IntersectionInfo& intersectionInfo, Material material, glm::vec3& color, glm::vec3 cameraVectorNormalized);
+	glm::vec3 refract(const glm::vec3& incoming, const glm::vec3& normal, const float& refractionIndex, float n_i);
+	float fresnel(const glm::vec3& incoming, const glm::vec3& normal, const float& refractionIndex, Material material, float n_i);
+	void refraction(int depth, Ray ray, IntersectionInfo& intersection, Material material, glm::vec3& color, glm::vec3 rayDirection, float n_i);
+
 };
 
 

@@ -3,9 +3,8 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include "glm/vec3.hpp"
 
-#include "defs.h"
-#include "RayTracing/glm/vec3.hpp"
 
 //
 // Access the color using either individual component names
@@ -39,11 +38,7 @@ typedef union Color
 
 		return Color{ (unsigned int)(red * c),(unsigned int)(grn * c),(unsigned int)(blu * c) };
 	}
-	ostream& operator<<(ostream& os)
-	{
-		return os << "red: " << red << " green: " << grn << " blue: " << blu << endl;
 
-	}
     unsigned int channel[3];
 } Color;
 

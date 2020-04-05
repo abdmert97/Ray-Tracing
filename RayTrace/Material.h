@@ -1,8 +1,7 @@
 #ifndef _MATERIAL_H_
 #define _MATERIAL_H_
 
-#include "defs.h"
-#include "RayTracing/glm/vec3.hpp"
+#include "Scene.h"
 
 enum MaterialType
 {

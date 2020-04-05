@@ -1,10 +1,9 @@
 #ifndef _CAMERA_H_
 #define _CAMERA_H_
 
-#include "Ray.h"
-
 #include "Scene.h"
-class Scene;
+#include "Ray.h"
+class Ray;
 // Structure for holding variables related to the image plane
 typedef struct ImagePlane
 {
@@ -23,13 +22,14 @@ public:
   char imageName[32];
   int id;
   ImagePlane imgPlane;     // Image plane
-
+  int sample;
 	Camera(int id,                      // Id of the camera
            const char* imageName,       // Name of the output PPM file
            const glm::vec3& pos,         // Camera position
            const glm::vec3& gaze,        // Camera gaze direction
            const glm::vec3& up,          // Camera up direction
-           const ImagePlane& imgPlane); // Image plane parameters
+           const ImagePlane& imgPlane,
+			int sample); // Image plane parameters
 
     // Computes the primary ray through pixel (row, col)
 	Ray getPrimaryRay(int row, int col, int xSample=0, int ySample=0) const;

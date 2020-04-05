@@ -1,8 +1,7 @@
 #ifndef _RAY_H_
 #define _RAY_H_
+#include "Scene.h"
 
-#include "defs.h"
-#include "RayTracing/glm/vec3.hpp"
 
 // Class for Ray object. You will implement the methods
 class Ray
